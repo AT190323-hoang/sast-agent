@@ -44,8 +44,8 @@
 | T1.2 | Scan registry packs trên Juice Shop | ✅ | 18 + 25 finding ở `reports/week1/` (có trùng lặp) |
 | T1.3 | Custom rule cho 2 nhóm còn thiếu | ✅ | 4 rule đã sửa lỗi + validate sạch. Scan Juice Shop: 25 candidate `missing_control` + 7 candidate `broken_invariant` |
 | T1.4 | Mở rộng nguồn finding (crAPI) | ✅ | Clone xong. Scan `workshop` (Django, 7 finding) + `identity` (Java, 4 finding) bằng registry pack. Chưa viết custom rule riêng cho BOLA/BFLA của crAPI — để dành khi gán nhãn (T1.6) đọc trực tiếp `shop/views.py`/`mechanic/views.py`, đây là nơi có ví dụ BOLA kinh điển |
-| T1.5 | Schema dataset + script chuẩn hoá | ⬜ | Schema đề xuất đã có trong kế hoạch. Cần gộp 5 file `reports/week1/findings_raw*.json`, khử trùng lặp (auto vs registry-combo bị chồng lấn) |
-| T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | ⬜ | |
+| T1.5 | Schema dataset + script chuẩn hoá | ✅ | `dataset/scripts/normalize_findings.py` gộp 5 file, dedupe theo (app, file, dòng, rule_id), map rule→nhóm qua bảng tường minh (rule lạ sẽ báo `UNCLASSIFIED` thay vì đoán). Output: `dataset/findings_draft.json` — 71 finding (missing_control 26, taint_flow 23, insecure_property 15, broken_invariant 7) |
+| T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | ⬜ | Tiếp theo. `broken_invariant` chỉ có 7 candidate — cần theo dõi tỷ lệ TP/FP sau khi gán, có thể phải bổ sung |
 | T1.7 | Viết `docs/taxonomy.md` | ⬜ | Đã có sẵn ví dụ thật cho `missing_control` |
 | T1.8 | Review: ≥10 finding/nhóm, không mơ hồ | ⬜ | |
 | T1.9 | Freeze dataset v1 + báo cáo tuần 1 | ⬜ | |
