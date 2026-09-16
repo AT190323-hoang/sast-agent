@@ -42,9 +42,9 @@
 |---|---|---|---|
 | T1.1 | Cài Opengrep + fix lỗi CA | ✅ | Opengrep v1.30.0 tại `~/.local/bin/opengrep` |
 | T1.2 | Scan registry packs trên Juice Shop | ✅ | 18 + 25 finding ở `reports/week1/` (có trùng lặp) |
-| T1.3 | Custom rule cho 2 nhóm còn thiếu | 🔶 | 4 rule nháp, 2 file đều còn lỗi cú pháp |
-| T1.4 | Mở rộng nguồn finding (crAPI/WebGoat) | ⬜ | Chờ chốt câu hỏi #2 |
-| T1.5 | Schema dataset + script chuẩn hoá | ⬜ | Schema đề xuất đã có trong kế hoạch |
+| T1.3 | Custom rule cho 2 nhóm còn thiếu | ✅ | 4 rule đã sửa lỗi + validate sạch. Scan Juice Shop: 25 candidate `missing_control` + 7 candidate `broken_invariant` |
+| T1.4 | Mở rộng nguồn finding (crAPI) | ✅ | Clone xong. Scan `workshop` (Django, 7 finding) + `identity` (Java, 4 finding) bằng registry pack. Chưa viết custom rule riêng cho BOLA/BFLA của crAPI — để dành khi gán nhãn (T1.6) đọc trực tiếp `shop/views.py`/`mechanic/views.py`, đây là nơi có ví dụ BOLA kinh điển |
+| T1.5 | Schema dataset + script chuẩn hoá | ⬜ | Schema đề xuất đã có trong kế hoạch. Cần gộp 5 file `reports/week1/findings_raw*.json`, khử trùng lặp (auto vs registry-combo bị chồng lấn) |
 | T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | ⬜ | |
 | T1.7 | Viết `docs/taxonomy.md` | ⬜ | Đã có sẵn ví dụ thật cho `missing_control` |
 | T1.8 | Review: ≥10 finding/nhóm, không mơ hồ | ⬜ | |
@@ -76,9 +76,9 @@
 | Mức độ | Vấn đề | Ảnh hưởng | Hướng xử lý |
 |---|---|---|---|
 | 🔴 Cao | `node`/`npm` chưa cài trên máy | Chặn codebase-memory-mcp (Tuần 2) và chạy Juice Shop thật | Cần cài trước Tuần 2, `sudo` cần mật khẩu nên user phải tự chạy |
-| 🟡 Vừa | Registry rule pack gần như không có rule cho `missing_control` / `broken_invariant` | Khó đủ 10 finding/nhóm | Viết custom Opengrep rule (T1.3) + cân nhắc thêm app khác |
-| 🟡 Vừa | Juice Shop ít bug kiểu null-deref / resource-leak | Nhóm `broken_invariant` có thể thiếu TP thật | Cân nhắc WebGoat (Java) làm nguồn bổ sung |
-| 🟢 Thấp | Docker chưa bật WSL integration | Chỉ ảnh hưởng nếu cần chạy crAPI (crAPI chạy bằng docker-compose) | Bật trong Docker Desktop khi tới Tuần 4 |
+| ✅ Đã xử lý (16/09) | Registry rule pack gần như không có rule cho `missing_control` / `broken_invariant` | — | Viết + sửa xong 4 custom Opengrep rule (T1.3), scan ra 25 candidate `missing_control` + 7 candidate `broken_invariant` |
+| 🟡 Vừa | 7 candidate `broken_invariant` hơi ít, chưa chắc đủ cả TP lẫn FP sau khi gán nhãn | Có thể thiếu case cho nhóm này | Xem lại sau khi gán nhãn; cân nhắc WebGoat (Java) hoặc thêm custom rule nếu thiếu |
+| ✅ Đã xử lý (16/09) | Docker chưa bật WSL integration | — | Thực ra đã bật sẵn từ trước; chỉ cần `sg docker -c "..."` do shell hiện tại chưa nạp lại group `docker` |
 
 ---
 

@@ -10,7 +10,7 @@ Máy: **WSL2 Ubuntu trên Windows 11**. Mạng công ty có **TLS inspection (Vi
 | `python3` | ✅ 3.10.6 | |
 | `pip` | ✅ đã bootstrap thủ công (`--user`) | Gọi bằng `python3 -m pip`, không có lệnh `pip3` |
 | `node` / `npm` | ❌ **chưa có** | 🔴 Blocker cho codebase-memory-mcp (Tuần 2) và chạy Juice Shop thật |
-| `docker` | ⚠️ chưa bật WSL integration | Cần bật trong Docker Desktop nếu chạy crAPI |
+| `docker` | ✅ đã hoạt động (16/09) | WSL integration đã bật sẵn từ trước. Lệnh docker cần chạy qua `sg docker -c "..."` vì shell hiện tại chưa nạp lại group `docker` (đã có trong `/etc/group`) — mở terminal WSL mới cũng tự hết |
 | `git`, `curl`, `wget` | ✅ | |
 | Opengrep | ✅ v1.30.0 | `~/.local/bin/opengrep` (đã có trong PATH qua `.bashrc`) |
 
@@ -139,4 +139,4 @@ Hai file đánh dấu ⭐ là chìa khoá của cả đề tài: **finding nằm
 - Anthropic SDK cho harness: `python3 -m pip install --user anthropic`
 - codebase-memory-mcp: https://github.com/DeusData/codebase-memory-mcp
 
-**Trước Tuần 4 (nếu dùng crAPI):** bật WSL integration trong Docker Desktop settings.
+**crAPI (đã chuyển vào Tuần 1):** Docker đã sẵn sàng, chạy `git clone` rồi `sg docker -c "docker compose up -d"` trong thư mục crAPI.
