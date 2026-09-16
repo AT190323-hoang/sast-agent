@@ -1,0 +1,28 @@
+rules:
+  - id: custom.broken-invariant.django-get-without-trycatch
+    languages: [python]
+    severity: WARNING
+    message: >
+      Django ORM .get() call not wrapped in try/except. .get() raises
+      DoesNotExist (not None) when no row matches, and MultipleObjectsReturned
+      when more than one matches — a common Django anti-pattern is to check
+      "if not result" afterwards, which is dead code because the exception is
+      raised before that line runs. Verify whether a framework-level
+      exception handler already converts this into a clean error response
+      before concluding this is a true positive.
+    metadata:
+      taxonomy: broken_invariant
+    patterns:
+      - pattern: $MODEL.objects.get(...)
+      - pattern-not-inside:
+          pattern-either:
+            - pattern: |
+                try:
+                    ...
+                except $EXC:
+                    ...
+            - pattern: |
+                try:
+                    ...
+                except $EXC as $NAME:
+                    ...

@@ -27,6 +27,7 @@ INPUT_FILES = [
     ("findings_raw_custom.json", "juice-shop", "/home/hoanglh98/projects/targets/juice-shop"),
     ("findings_raw_crapi_workshop.json", "crapi", "/home/hoanglh98/projects/targets/crapi"),
     ("findings_raw_crapi_identity.json", "crapi", "/home/hoanglh98/projects/targets/crapi"),
+    ("findings_raw_crapi_broken_invariant.json", "crapi", "/home/hoanglh98/projects/targets/crapi"),
 ]
 
 ID_PREFIX = {"juice-shop": "JS", "crapi": "CRAPI"}
@@ -120,15 +121,51 @@ def dedupe(findings):
     return list(seen.values())
 
 
+def content_key(f):
+    return (f["source_app"], f["file"], f["start_line"], f["end_line"], f["rule_id"])
+
+
+def load_existing_ids():
+    """Đọc findings_draft.json hiện có (nếu có) để TÁI SỬ DỤNG id cũ.
+
+    Bắt buộc phải làm vậy: dataset/labels/*.json tham chiếu finding theo id
+    (vd "JS-0007"). Nếu chạy lại script mà đánh số lại từ đầu, id có thể trỏ
+    sang finding khác, âm thầm làm sai toàn bộ nhãn đã gán trước đó.
+    """
+    if not OUT_PATH.exists():
+        return {}
+    existing = json.loads(OUT_PATH.read_text())
+    return {content_key(f): f["id"] for f in existing}
+
+
 def assign_ids(findings):
+    existing_ids = load_existing_ids()
     counters = {}
+    # Số đã dùng cho mỗi prefix, để id mới không trùng id cũ đã tồn tại.
+    for eid in existing_ids.values():
+        prefix, num = eid.rsplit("-", 1)
+        counters[prefix] = max(counters.get(prefix, 0), int(num))
+
+    # Finding đã có id giữ nguyên thứ tự/id cũ; finding mới nối vào cuối
+    # theo prefix, không sắp xếp lại toàn bộ (tránh xáo trộn id đã gán nhãn).
     findings.sort(key=lambda f: (f["source_app"], f["file"], f["start_line"]))
+    reused, new = [], []
     for f in findings:
+        key = content_key(f)
+        if key in existing_ids:
+            f["id"] = existing_ids[key]
+            reused.append(f)
+        else:
+            new.append(f)
+
+    for f in new:
         prefix = ID_PREFIX[f["source_app"]]
         counters[prefix] = counters.get(prefix, 0) + 1
         f["id"] = f"{prefix}-{counters[prefix]:04d}"
-    # đặt id lên đầu dict khi in ra
-    return [{"id": f["id"], **{k: v for k, v in f.items() if k != "id"}} for f in findings]
+
+    print(f"ID giữ nguyên: {len(reused)}  |  ID mới cấp: {len(new)}")
+    all_final = sorted(reused + new, key=lambda f: f["id"])
+    return [{"id": f["id"], **{k: v for k, v in f.items() if k != "id"}} for f in all_final]
 
 
 def main():
