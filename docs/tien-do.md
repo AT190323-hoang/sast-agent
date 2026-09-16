@@ -66,8 +66,8 @@ xem `dataset/labels/missing_control.json`.
 | T1.4 | Mở rộng nguồn finding (crAPI) | ✅ | Clone xong. Scan `workshop` (Django, 7 finding) + `identity` (Java, 4 finding) bằng registry pack. Chưa viết custom rule riêng cho BOLA/BFLA của crAPI — để dành khi gán nhãn (T1.6) đọc trực tiếp `shop/views.py`/`mechanic/views.py`, đây là nơi có ví dụ BOLA kinh điển |
 | T1.5 | Schema dataset + script chuẩn hoá | ✅ | `dataset/scripts/normalize_findings.py` gộp 6 file, dedupe theo (app, file, dòng, rule_id), map rule→nhóm qua bảng tường minh (rule lạ sẽ báo `UNCLASSIFIED` thay vì đoán). Script đã sửa để **giữ nguyên id cũ khi chạy lại** (chỉ cấp id mới cho finding thực sự mới) — quan trọng vì `dataset/labels/*.json` tham chiếu finding theo id. Output: `dataset/findings_draft.json` — **87 finding** (missing_control 26, taint_flow 23, insecure_property 15, broken_invariant 23) |
 | T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | ✅ | **87/87 xong, cả 4 nhóm đạt ngưỡng ≥10 với cả TP lẫn FP.** `taint_flow` 12 TP/11 FP. `insecure_property` 13 TP/2 FP. `missing_control` 2 TP/24 FP (đã tách 5 loại nguyên nhân FP). `broken_invariant` 13 TP/10 FP (bổ sung 16 candidate từ rule mới `custom.broken-invariant.django-get-without-trycatch` quét crAPI — Django `.get()` không try/except). Phát hiện phụ: tìm ra chính custom rule của mình có 1 false-negative (pattern `except $EXC:` không khớp `except $EXC as $NAME:`) khi gán nhãn `CRAPI-0021` — đã sửa rule trong `harness/rules/`, nhưng **giữ nguyên** file scan gốc + nhãn trong dataset (không rerun) để không làm mất case này, vốn là ví dụ tốt cho báo cáo |
-| T1.7 | Viết `docs/taxonomy.md` | ⬜ | Đã có sẵn ví dụ thật cho `missing_control` |
-| T1.8 | Review: ≥10 finding/nhóm, không mơ hồ | ⬜ | |
+| T1.7 | Viết `docs/taxonomy.md` | ✅ | Định nghĩa 4 nhóm + 3 quy tắc phân định ranh giới + ví dụ TP/FP thật (kèm code) cho từng nhóm, rút từ `dataset/labels/*.json` |
+| T1.8 | Review: ≥10 finding/nhóm, không mơ hồ | ⬜ | ≥10 đã đạt cả 4 nhóm (T1.6). Còn cần: mentor/người thứ 2 review 1 mẫu nhỏ (câu hỏi #4 Tuần 1 — chưa chốt) |
 | T1.9 | Freeze dataset v1 + báo cáo tuần 1 | ⬜ | |
 
 ---
