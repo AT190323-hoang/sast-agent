@@ -1,0 +1,44 @@
+{
+  "JS-0007": {
+    "label": "FP",
+    "reason": "Dòng này nằm trong hàm appendUserId() (lib/insecurity.ts:175-184), toàn bộ thân hàm được bọc trong try/catch. Nếu authenticatedUsers.tokenMap[utils.jwtFrom(req)] là undefined, việc truy cập .data.id ném TypeError và bị catch bắt lại, trả về 401. Bất biến 'token hợp lệ' được đảm bảo bằng exception handling, không phải bằng null-check — rule chỉ tìm null-check/optional-chaining nên báo nhầm.",
+    "context_needed": "Phải đọc toàn bộ thân hàm bao quanh dòng bị flag (không chỉ 1 dòng) để thấy try/catch ở ngoài — nếu chỉ nhìn snippet 1 dòng như SAST thường làm thì không thấy được.",
+    "confidence": "high"
+  },
+  "JS-0008": {
+    "label": "FP",
+    "reason": "varName truyền vào checkIfEnvironmentVariableExists() luôn là literal 'ALCHEMY_API_KEY' (lib/startup/validatePreconditions.ts:71), trùng khớp key duy nhất định nghĩa trong variableDependencies (dòng 24-30, cùng file). Bất biến 'key tồn tại trong map' được đảm bảo bằng cấu trúc code (2 literal giống hệt nhau), không phải ngẫu nhiên. Ngoài ra đây là code chạy lúc khởi động server, không nhận input từ request nào.",
+    "context_needed": "Cần grep tìm nơi gọi hàm (không chỉ đọc định nghĩa hàm) để thấy tham số truyền vào luôn là literal cố định, đồng thời xem định nghĩa map để xác nhận key khớp.",
+    "confidence": "high"
+  },
+  "JS-0009": {
+    "label": "FP",
+    "reason": "Y hệt JS-0008 nhưng cho domainDependencies/checkIfDomainReachable — domain truyền vào luôn là 'https://www.alchemy.com/' hoặc config.get('application.chatBot.llmApiUrl'), cả hai đều là key có sẵn trong domainDependencies (dòng 32-40, cùng file).",
+    "context_needed": "Giống JS-0008: grep nơi gọi hàm + đối chiếu định nghĩa map.",
+    "confidence": "high"
+  },
+  "JS-0021": {
+    "label": "TP",
+    "reason": "getRecycleItem() gọi JSON.parse(req.params.id) đồng bộ khi xây dựng tham số cho RecycleModel.findAll(), TRƯỚC khi promise chain .then().catch() bắt đầu chạy. .catch() ở dòng 18 chỉ bắt lỗi từ chính findAll(), không bắt được lỗi JSON.parse xảy ra khi tạo object truyền vào. Request tới /api/Recycles/abc (id không phải JSON hợp lệ, ví dụ chuỗi không phải số) khiến JSON.parse ném SyntaxError đồng bộ, rơi vào error handler mặc định của Express thay vì message thân thiện dev đã viết ở dòng 19.",
+    "context_needed": "Cần hiểu thứ tự thực thi JS: object literal truyền vào .findAll() được evaluate đồng bộ trước khi promise chain gắn .catch() bắt đầu — dễ nhầm là 'đã có catch nên an toàn' nếu không để ý điểm này.",
+    "confidence": "medium"
+  },
+  "JS-0026": {
+    "label": "FP",
+    "reason": "reviews[i] luôn hợp lệ vì vòng lặp 'for (let i = 0; i < reviews.length; i++)' ngay phía trên đảm bảo i luôn trong phạm vi mảng. Đây là bất biến được đảm bảo bởi chính điều kiện vòng lặp liền kề, không cần tra cứu gì xa.",
+    "context_needed": "Chỉ cần đọc vài dòng code ngay phía trên (điều kiện vòng lặp) — ví dụ context 'rẻ' nhất trong tập này, không cần cross-file.",
+    "confidence": "high"
+  },
+  "JS-0029": {
+    "label": "FP",
+    "reason": "hasAlgorithm(token, algorithm) chỉ được gọi bên trong callback của jwt.verify(token, ..., (err) => { if (err === null) { ...hasAlgorithm(token, algorithm)... } }) ở dòng 125-128. jwt.verify trả err===null nghĩa là token đã được xác minh có cấu trúc JWT hợp lệ (3 phần base64url, chữ ký đúng) — thư viện jwt đã tự parse header nội bộ để verify, nên JSON.parse(Buffer.from(token.split('.')[0], 'base64').toString()) ở dòng 136 chắc chắn nhận input hợp lệ.",
+    "context_needed": "Phải lần theo caller (ai gọi hasAlgorithm, trong điều kiện nào) chứ không chỉ nhìn thân hàm hasAlgorithm — bất biến do hàm gọi trước đó (jwt.verify) đảm bảo, đúng kiểu broken_invariant kinh điển trong taxonomy.",
+    "confidence": "high"
+  },
+  "JS-0037": {
+    "label": "TP",
+    "reason": "Middleware toàn cục (app.use không path, chạy cho MỌI request) tại server.ts:334-346. req.body = JSON.parse(req.body) không có try/catch, chỉ cần header Content-Type chứa 'application/json' + body không phải JSON hợp lệ là ném lỗi ở bất kỳ endpoint nào. Comment ngay dòng phía trên ('Expensive workaround for 500 errors during Frisby test run (see #640)') là bằng chứng chính dev đã biết đây từng gây lỗi 500 nhưng chưa xử lý triệt để tận gốc.",
+    "context_needed": "Đọc toàn bộ middleware (không chỉ dòng bị flag) để thấy đây là global middleware chạy cho mọi route, tăng mức độ nghiêm trọng so với một route đơn lẻ.",
+    "confidence": "high"
+  }
+}

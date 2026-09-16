@@ -8,20 +8,40 @@
 
 ---
 
+## ⭐ Phát hiện quan trọng khi gán nhãn `missing_control` (16/09)
+
+Case kinh điển nhất của Juice Shop (guard `security.isAuthorized()` bị comment out ở
+`server.ts:389` cho `PUT /api/Products/:id`) **không nằm trong dataset**, dù đã quét bằng cả
+registry rule lẫn custom rule. Lý do: route đó không tồn tại như một câu lệnh `app.put(...)`
+tường minh — nó được **sinh tự động** bởi `finale.initialize({ app, sequelize: seq })` +
+mảng `autoModels` (server.ts:500-522, thư viện REST scaffolding cho Sequelize model). Đây là
+loại blind-spot **hoàn toàn khác** với "guard nằm ở file khác": không phải agent thiếu context
+để verify, mà là **không có finding nào để verify từ đầu** (vấn đề recall của rule, xảy ra
+trước cả bước SAST chạy). Đáng đưa vào tài liệu root-cause Tuần 4 như một giới hạn cần nêu rõ,
+nhưng **không đưa vào dataset** vì không có tool nào thực sự tạo ra finding này (giữ đúng
+nguyên tắc "dataset gồm finding do tool sinh ra", không tự chèn case biết trước đáp án).
+
+Ngoài ra, khi gán nhãn 26 candidate `missing_control`, chỉ 2 là TP thật — 24 còn lại là FP
+nhưng tách được **5 nguyên nhân FP khác nhau** (guard qua path-prefix middleware trong cùng
+file; guard qua ownership-filter với giá trị bị middleware ghi đè trước khi tới handler; guard
+nằm inline trong handler ở file route riêng; endpoint public-by-design theo nghiệp vụ; endpoint
+thao tác state toàn cục không gắn với user cụ thể). Chi tiết đầy đủ + dẫn chứng từng dòng code:
+xem `dataset/labels/missing_control.json`.
+
 ## Việc tiếp theo cần làm
 
-1. Sửa nốt custom rule bị lỗi cú pháp (`harness/rules/broken-invariant-candidates.yaml` —
-   pattern `try { ... } catch (...) { ... }` không hợp lệ với TypeScript parser của Opengrep;
-   `missing-control-candidates.yaml` lỗi YAML ở dòng 14).
-2. Chạy lại scan với custom rule → xem có đủ finding cho `missing_control` và
-   `broken_invariant` không.
+1. Gán nhãn nốt `taint_flow` (23 candidate) và `insecure_property` (15 candidate) — chạy
+   `python3 dataset/scripts/apply_labels.py` sau khi thêm mỗi file `dataset/labels/<nhóm>.json`.
+2. Xử lý khoảng trống `broken_invariant` (7 candidate, cần ≥10): cân nhắc quét thêm service
+   `chatbot` (Python) của crAPI, hoặc viết thêm 1 custom rule (resource không đóng, Django
+   `.get()` có thể raise `DoesNotExist` không bắt).
 3. **Chốt quy ước TP/FP** cho app cố ý chứa lỗi (câu hỏi #1 Tuần 1 — chưa chốt) và hỏi mentor
    về việc review nhãn (câu hỏi #4 — chưa chốt).
-4. Clone + dựng crAPI (cần bật Docker Desktop WSL integration), scan lấy finding
-   `missing_control`.
-5. Chốt schema dataset + viết script chuẩn hoá output Opengrep → dataset rows.
-6. Gán nhãn TP/FP (được dùng Claude hỗ trợ đọc/trace, tiêu chuẩn nhãn không đổi — xem T1.6).
-7. Sau khi Tuần 1 xong: khảo sát agent-harness repo có sẵn cho Tuần 2 (T2.0).
+4. Viết `docs/taxonomy.md` (T1.7) — đã có rất nhiều ví dụ thật + lý do cụ thể trong
+   `dataset/labels/*.json`, chỉ cần tổng hợp lại.
+5. Review toàn bộ dataset đã gán nhãn (T1.8), rồi freeze thành `dataset/findings_v1.json` +
+   viết `reports/week1/bao-cao-tuan-1.md` (T1.9).
+6. Sau khi Tuần 1 xong: khảo sát agent-harness repo có sẵn cho Tuần 2 (T2.0).
 
 ---
 
@@ -45,7 +65,7 @@
 | T1.3 | Custom rule cho 2 nhóm còn thiếu | ✅ | 4 rule đã sửa lỗi + validate sạch. Scan Juice Shop: 25 candidate `missing_control` + 7 candidate `broken_invariant` |
 | T1.4 | Mở rộng nguồn finding (crAPI) | ✅ | Clone xong. Scan `workshop` (Django, 7 finding) + `identity` (Java, 4 finding) bằng registry pack. Chưa viết custom rule riêng cho BOLA/BFLA của crAPI — để dành khi gán nhãn (T1.6) đọc trực tiếp `shop/views.py`/`mechanic/views.py`, đây là nơi có ví dụ BOLA kinh điển |
 | T1.5 | Schema dataset + script chuẩn hoá | ✅ | `dataset/scripts/normalize_findings.py` gộp 5 file, dedupe theo (app, file, dòng, rule_id), map rule→nhóm qua bảng tường minh (rule lạ sẽ báo `UNCLASSIFIED` thay vì đoán). Output: `dataset/findings_draft.json` — 71 finding (missing_control 26, taint_flow 23, insecure_property 15, broken_invariant 7) |
-| T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | ⬜ | Tiếp theo. `broken_invariant` chỉ có 7 candidate — cần theo dõi tỷ lệ TP/FP sau khi gán, có thể phải bổ sung |
+| T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | 🔶 | 33/71 xong (`broken_invariant`: 2 TP/5 FP — dưới ngưỡng 10, cần bổ sung; `missing_control`: 2 TP/24 FP — đủ ngưỡng, tỷ lệ lệch mạnh về FP nhưng đúng thực tế đã kiểm chứng). Còn `taint_flow` (23) + `insecure_property` (15) |
 | T1.7 | Viết `docs/taxonomy.md` | ⬜ | Đã có sẵn ví dụ thật cho `missing_control` |
 | T1.8 | Review: ≥10 finding/nhóm, không mơ hồ | ⬜ | |
 | T1.9 | Freeze dataset v1 + báo cáo tuần 1 | ⬜ | |

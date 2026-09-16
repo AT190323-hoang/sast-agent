@@ -1,0 +1,123 @@
+{
+  "CRAPI-0011": {
+    "label": "TP",
+    "reason": "REST_FRAMEWORK config (settings.py:128-136) không có DEFAULT_THROTTLE_CLASSES/DEFAULT_THROTTLE_RATES. grep 'throttle' trên toàn bộ services/workshop/crapi/ (views.py mọi module) không ra kết quả nào — không có view nào override throttle_classes riêng. Nghĩa là TOÀN BỘ API (kể cả các endpoint xác thực OTP nhạy cảm) không có rate-limiting nào. Đây là 1 trong các lỗ hổng cố ý nổi tiếng của crAPI (brute-force OTP ở luồng quên mật khẩu).",
+    "context_needed": "Phải grep toàn bộ codebase tìm 'throttle_classes' để xác nhận không có override ở view nào — nếu chỉ đọc settings.py sẽ không chắc liệu có nơi nào tự bù đắp không.",
+    "confidence": "high"
+  },
+  "JS-0010": {
+    "label": "FP",
+    "reason": "where filter dùng CẢ id lẫn UserId (address.ts:29: where: { id: req.params.id, UserId: req.body.UserId }), không phải chỉ id như rule giả định. UserId tưởng là attacker-controlled vì đọc từ req.body, nhưng route DELETE /api/Addresss/:id (server.ts:470) có security.appendUserId() chạy TRƯỚC handler — middleware này ghi đè req.body.UserId bằng id thật của user đã đăng nhập (lấy từ JWT), nên giá trị này không thể giả mạo được lúc tới handler.",
+    "context_needed": "Phải grep tìm route này được đăng ký ở server.ts với middleware nào đứng trước handler, rồi đọc định nghĩa appendUserId() trong lib/insecurity.ts để biết nó ghi đè req.body.UserId chứ không chỉ đọc.",
+    "confidence": "high"
+  },
+  "JS-0019": {
+    "label": "FP",
+    "reason": "Y hệt JS-0010: payment.ts:70 where: { id: req.params.id, UserId: req.body.UserId }, route DELETE /api/Cards/:id (server.ts:460) có security.appendUserId() chạy trước, ghi đè UserId bằng giá trị thật từ JWT.",
+    "context_needed": "Giống JS-0010.",
+    "confidence": "high"
+  },
+  "JS-0038": {
+    "label": "FP",
+    "reason": "Comment ngay phía trên trong server.ts ghi rõ: '/* Feedbacks: GET allowed for feedback carousel, POST allowed in order to provide feedback without being logged in */' — endpoint POST /api/Feedbacks cố ý public theo thiết kế, không phải thiếu sót.",
+    "context_needed": "Đọc comment/context xung quanh route registration trong server.ts để biết đây là quyết định thiết kế có chủ đích, không phải lỗi.",
+    "confidence": "high"
+  },
+  "JS-0039": { "label": "FP", "reason": "Cùng route /api/Feedbacks POST với JS-0038, cùng lý do: public theo thiết kế để cho phép feedback không cần đăng nhập.", "context_needed": "Giống JS-0038.", "confidence": "high" },
+  "JS-0040": { "label": "FP", "reason": "Cùng route /api/Feedbacks POST, cùng lý do JS-0038.", "context_needed": "Giống JS-0038.", "confidence": "high" },
+  "JS-0041": {
+    "label": "FP",
+    "reason": "Đây là middleware inline trim input, chạy trước route POST /api/Users (đăng ký tài khoản mới). Comment server.ts: '/* Users: Only POST is allowed in order to register a new user */'. Đăng ký tài khoản BẮT BUỘC phải public — không thể yêu cầu đăng nhập để đăng ký.",
+    "context_needed": "Hiểu bản chất nghiệp vụ của endpoint (đăng ký) để biết yêu cầu auth ở đây là vô lý về mặt thiết kế, không cần tra thêm code.",
+    "confidence": "high"
+  },
+  "JS-0042": { "label": "FP", "reason": "Cùng route POST /api/Users (đăng ký), cùng lý do JS-0041.", "context_needed": "Giống JS-0041.", "confidence": "high" },
+  "JS-0043": { "label": "FP", "reason": "Cùng route POST /api/Users (đăng ký), cùng lý do JS-0041.", "context_needed": "Giống JS-0041.", "confidence": "high" },
+  "JS-0044": { "label": "FP", "reason": "Cùng route POST /api/Users (đăng ký), cùng lý do JS-0041.", "context_needed": "Giống JS-0041.", "confidence": "high" },
+  "JS-0045": {
+    "label": "FP",
+    "reason": "POST /rest/user/login — đăng nhập theo định nghĩa phải public (không thể yêu cầu đã đăng nhập để được đăng nhập).",
+    "context_needed": "Hiểu bản chất nghiệp vụ endpoint, không cần tra code thêm.",
+    "confidence": "high"
+  },
+  "JS-0046": {
+    "label": "FP",
+    "reason": "POST /rest/user/reset-password — khởi tạo quên mật khẩu phải public theo định nghĩa. Được bảo vệ bằng rate-limiting (app.use('/rest/user/reset-password', rateLimit(...)) ở server.ts:362) thay vì auth — đúng cơ chế bảo vệ phù hợp cho loại endpoint này.",
+    "context_needed": "Kiểm tra có cơ chế bảo vệ nào khác (rate limit) thay thế cho auth hay không trước khi kết luận thiếu kiểm soát.",
+    "confidence": "high"
+  },
+  "JS-0047": {
+    "label": "FP",
+    "reason": "POST /rest/basket/:id/checkout được bao phủ bởi app.use('/rest/basket/:id', security.isAuthorized()) đăng ký sớm hơn ở server.ts:418 — Express match theo path-prefix nên middleware này áp dụng cho mọi route con của /rest/basket/:id, kể cả /checkout.",
+    "context_needed": "Phải hiểu cơ chế path-prefix matching của app.use() trong Express — guard không cần xuất hiện ngay tại route cụ thể, có thể nằm ở một app.use() với path ngắn hơn đăng ký trước đó.",
+    "confidence": "high"
+  },
+  "JS-0048": {
+    "label": "FP",
+    "reason": "PUT /rest/basket/:id/coupon/:coupon cũng thuộc prefix /rest/basket/:id, được bảo vệ bởi app.use('/rest/basket/:id', security.isAuthorized()) ở server.ts:418, lý do giống JS-0047.",
+    "context_needed": "Giống JS-0047.",
+    "confidence": "high"
+  },
+  "JS-0049": {
+    "label": "FP",
+    "reason": "restoreProgressFindIt() (routes/restoreProgress.ts) chỉ giải mã continueCode bằng Hashids rồi cập nhật TRẠNG THÁI CHALLENGE TOÀN CỤC của server (challengeUtils.solveFindIt) — không đụng đến dữ liệu cá nhân của bất kỳ user nào. continueCode tự nó đóng vai trò như một credential (chỉ ai có code hợp lệ mới restore được), và tính năng này vốn cho phép chia sẻ tiến trình chơi giữa các phiên/máy khác nhau — đúng ý đồ thiết kế, không phải thiếu kiểm soát.",
+    "context_needed": "Đọc toàn bộ hàm xử lý để thấy nó không thao tác dữ liệu gắn với user cụ thể nào — nếu chỉ nhìn route path (có 'apply', PUT) dễ tưởng nhầm là thao tác ghi nhạy cảm.",
+    "confidence": "medium"
+  },
+  "JS-0050": { "label": "FP", "reason": "Cùng file restoreProgress.ts, cùng lý do JS-0049 (restoreProgressFixIt, thao tác state toàn cục).", "context_needed": "Giống JS-0049.", "confidence": "medium" },
+  "JS-0051": { "label": "FP", "reason": "Cùng file restoreProgress.ts, cùng lý do JS-0049 (restoreProgress, thao tác state toàn cục).", "context_needed": "Giống JS-0049.", "confidence": "medium" },
+  "JS-0052": {
+    "label": "TP",
+    "reason": "createProductReviews() đọc security.authenticatedUsers.from(req) nhưng KHÔNG reject khi user===undefined — chỉ dùng để so sánh trong challengeUtils.solveIf() (logic phát hiện challenge, không phải access control). Trường 'author' lấy trực tiếp từ req.body.author, cho phép người dùng chưa đăng nhập tạo review và MẠO DANH tác giả bất kỳ. Đây chính là challenge 'forgedReviewChallenge' cố ý của Juice Shop — một lỗ hổng thật.",
+    "context_needed": "Phải đọc toàn bộ thân hàm để thấy user chỉ được dùng cho mục đích khác (kiểm tra challenge), không hề có nhánh return/reject khi user là undefined — dễ nhầm là 'có kiểm tra auth' nếu chỉ thấy dòng gọi authenticatedUsers.from(req) mà không đọc tiếp.",
+    "confidence": "high"
+  },
+  "JS-0053": {
+    "label": "FP",
+    "reason": "chat.ts thiết kế cho phép chat với bot ở trạng thái ẩn danh — getUserId()/getUserNameFromToken() trả về undefined một cách graceful khi không có token thay vì reject request, phù hợp với chatbot hỗ trợ khách chưa đăng nhập.",
+    "context_needed": "Đọc cách các hàm helper xử lý trường hợp không có token (return undefined thay vì throw) để thấy đây là lựa chọn thiết kế cho phép anonymous, không phải thiếu sót.",
+    "confidence": "medium"
+  },
+  "JS-0054": {
+    "label": "FP",
+    "reason": "checkKeys() (web3 'Mint the Honey Pot' challenge) chỉ so sánh private key nhập vào với 1 mnemonic ví cố định toàn cục, cập nhật cờ challenge toàn server — không có dữ liệu nào gắn với tài khoản người dùng cụ thể để cần bảo vệ.",
+    "context_needed": "Đọc toàn bộ hàm để thấy không có state nào gắn với user, chỉ là 1 tính năng game/challenge công khai.",
+    "confidence": "high"
+  },
+  "JS-0055": {
+    "label": "FP",
+    "reason": "walletNFTVerify() (nftMint.ts) chỉ tra cứu 1 Set toàn cục addressesMinted theo địa chỉ ví blockchain (vốn là thông tin công khai trên chain) — không có dữ liệu tài khoản người dùng nào bị lộ hay có thể bị mạo danh gây hại.",
+    "context_needed": "Giống JS-0054 — đọc toàn bộ để thấy state là global Set, không phải per-user.",
+    "confidence": "high"
+  },
+  "JS-0056": {
+    "label": "FP",
+    "reason": "contractExploitListener() (web3Wallet.ts) cũng dùng Set toàn cục walletsConnected theo địa chỉ ví — cùng lý do JS-0054/JS-0055.",
+    "context_needed": "Giống JS-0054.",
+    "confidence": "high"
+  },
+  "JS-0057": {
+    "label": "FP",
+    "reason": "POST /b2b/v2/orders thuộc prefix /b2b/v2, được bảo vệ bởi app.use('/b2b/v2', security.isAuthorized()) đăng ký sớm hơn ở server.ts:443 (comment: 'Unauthorized users are not allowed to access B2B API').",
+    "context_needed": "Giống JS-0047 — hiểu path-prefix middleware của Express.",
+    "confidence": "high"
+  },
+  "JS-0058": {
+    "label": "FP",
+    "reason": "updateUserProfile() có guard inline rõ ràng: 'if (!loggedInUser) { next(new Error(...)); return }' (updateUserProfile.ts:19-22) — reject đúng cách khi chưa đăng nhập.",
+    "context_needed": "Đọc file handler ở routes/ (không chỉ nhìn dòng đăng ký route ở server.ts) để thấy guard nằm ngay đầu hàm xử lý.",
+    "confidence": "high"
+  },
+  "JS-0059": {
+    "label": "FP",
+    "reason": "checkVulnLines() (vulnCodeSnippet.ts) chỉ so khớp danh sách dòng người dùng chọn với đáp án của 1 code snippet tĩnh theo 'key' — không đọc/ghi dữ liệu gắn với tài khoản nào, là tính năng quiz công khai của game.",
+    "context_needed": "Đọc toàn bộ hàm để thấy dữ liệu xử lý (snippetData, vulnLines) không liên quan gì đến user hiện tại.",
+    "confidence": "high"
+  },
+  "JS-0060": {
+    "label": "FP",
+    "reason": "checkCorrectFix() (vulnCodeFixes.ts) cùng họ tính năng với checkVulnLines — quiz code-fix công khai theo key, không có dữ liệu per-user.",
+    "context_needed": "Cùng pattern JS-0059, cùng file family (vulnCodeFixes.ts tương tự vulnCodeSnippet.ts).",
+    "confidence": "medium"
+  }
+}
