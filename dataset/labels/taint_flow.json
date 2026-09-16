@@ -1,0 +1,120 @@
+{
+  "CRAPI-0006": {
+    "label": "FP",
+    "reason": "template.render({'service': response_data}) dùng get_template('service_report.html') — tên file template CỐ ĐỊNH (hardcoded), không phải build động từ input. Đọc trực tiếp file template (services/workshop/utils/service_report.html) xác nhận: mọi biến đều dùng cú pháp {{ var }} thông thường, KHÔNG có filter |safe hay {% autoescape off %} nào — Django tự động escape HTML mặc định. Kể cả service.problem_details (khả năng chứa input người dùng) cũng được escape.",
+    "context_needed": "Không chỉ đọc lời gọi .render() mà phải mở chính file template để xác nhận autoescape có bị tắt ở đâu không — nếu chỉ đọc views.py sẽ không thấy được.",
+    "confidence": "high"
+  },
+  "CRAPI-0009": {
+    "label": "TP",
+    "reason": "cursor.execute() nối chuỗi trực tiếp coupon_request_body['coupon_code'] (lấy từ request body) vào câu SQL thô, không dùng tham số hoá. SQL injection thật, khai thác được qua endpoint áp dụng coupon.",
+    "context_needed": "Đọc toàn bộ câu lệnh execute() nhiều dòng để thấy rõ chuỗi được ghép từ đâu — chỉ đọc 1 dòng flag có thể bỏ sót nguồn dữ liệu.",
+    "confidence": "high"
+  },
+  "CRAPI-0010": {
+    "label": "TP",
+    "reason": "Cùng câu lệnh với CRAPI-0009, bị 2 rule khác nhau cùng flag (sqlalchemy-execute-raw-query và tainted-sql-string).",
+    "context_needed": "Giống CRAPI-0009.",
+    "confidence": "high"
+  },
+  "JS-0001": {
+    "label": "FP",
+    "reason": "loadSourceFile(relativePath) chỉ được gọi từ checkForSourceFileOverlap() với filePath lấy từ challengeSourceFiles[challengeKey] — một mapping nội bộ cố định (developer-defined), không có route nào truyền challengeKey/filePath từ request vào đây.",
+    "context_needed": "Grep tìm TẤT CẢ nơi gọi loadSourceFile() để xác nhận filePath luôn đến từ mapping nội bộ, không phải từ req.",
+    "confidence": "high"
+  },
+  "JS-0002": {
+    "label": "FP",
+    "reason": "new RegExp(...${challengeKey}...) — challengeKey ở đây được sinh ra bằng cách QUÉT CHÍNH FILE SOURCE CODE của app lúc khởi động (tìm comment 'vuln-code-snippet start <key>' trong server.ts/routes/lib/...), không hề đến từ request nào. Đây là hàm precompute chạy 1 lần lúc server start.",
+    "context_needed": "Phải lần theo toàn bộ chuỗi gọi: getCodeChallengesFromFile() → findFilesWithCodeChallenges() để thấy challengeKey xuất phát từ đâu — nếu chỉ nhìn riêng dòng new RegExp() sẽ tưởng challengeKey là tham số hàm bất kỳ, có thể từ request.",
+    "confidence": "high"
+  },
+  "JS-0003": {
+    "label": "FP",
+    "reason": "Cùng hàm getCodingChallengeFromFileContent với JS-0002, cùng lý do.",
+    "context_needed": "Giống JS-0002.",
+    "confidence": "high"
+  },
+  "JS-0011": {
+    "label": "TP",
+    "reason": "body.orderLinesData (toàn quyền điều khiển bởi client qua request body) được truyền thẳng vào safeEval() của thư viện 'notevil' bên trong vm.runInContext(). Đây chính là challenge rceChallenge/rceOccupyChallenge cố ý — bypass sandbox notevil để RCE hoặc gây treo service (timeout) là mục tiêu thật của challenge.",
+    "context_needed": "Không cần context gì thêm — luồng source(body.orderLinesData)→sink(safeEval) nằm trọn trong 1 hàm, dễ thấy ngay.",
+    "confidence": "high"
+  },
+  "JS-0012": {
+    "label": "FP",
+    "reason": "eval(expression) — expression được xây dựng HOÀN TOÀN từ Math.random() và 1 danh sách toán tử cố định ngay phía trên (dùng để sinh câu hỏi CAPTCHA toán học), không có bất kỳ phần nào từ request. Rule chỉ phát hiện cú pháp eval(...) mà không phân biệt được input có bị taint hay không.",
+    "context_needed": "Đọc các dòng ngay phía trên eval() để thấy toàn bộ biến đầu vào đến từ Math.random(), không phải request — ví dụ tốt cho thấy eval-detected là rule syntax-only, không taint-aware.",
+    "confidence": "high"
+  },
+  "JS-0013": {
+    "label": "TP",
+    "reason": "req.query.fields cho phép client chỉ định TÊN TRƯỜNG bất kỳ để đọc từ user.data[field] (line 30-31). Comment ngay trong code: 'Solve passwordHashLeakChallenge when password field is included in response' — xác nhận nếu user.data có trường password, request ?fields=password sẽ làm lộ nó qua response. Đây chính là passwordHashLeakChallenge cố ý.",
+    "context_needed": "Đọc toàn bộ nhánh xử lý requestedFields (không chỉ dòng bị flag) + đọc comment liên quan tới challenge để xác nhận đây là lỗ hổng có chủ đích.",
+    "confidence": "high"
+  },
+  "JS-0014": {
+    "label": "FP",
+    "reason": "res.sendFile(path.resolve('ftp/', file)) — nhưng dòng 17 đã chặn 'if (!file.includes(\\'/\\'))' TRƯỚC khi vào verify(). Không có dấu '/' trong file thì không thể dùng '../' để thoát khỏi thư mục ftp/ ra ngoài hệ thống — claim cụ thể của rule ('arbitrarily read files ON THE SYSTEM') không đúng. LƯU Ý: code này VẪN có lỗ hổng thật nhưng thuộc loại khác — cutOffPoisonNullByte() ở dòng 27 cho phép bypass check đuôi file '.md'/.pdf' bằng ký tự null byte (ví dụ 'coupons_2013.md.bak%00.md'), nhưng vẫn chỉ đọc được file NẰM TRONG ftp/, không đi ra ngoài. Đây là ví dụ 'đúng sink, sai loại lỗ hổng' — rule cảnh báo path traversal ra ngoài hệ thống, nhưng lỗ hổng thật là bypass allowlist đuôi file trong cùng thư mục.",
+    "context_needed": "Đọc toàn bộ hàm verify() + nhận diện cụ thể rule đang claim điều gì (path traversal RA NGOÀI thư mục) để so với thực tế (chỉ bypass được đuôi file, không thoát thư mục) — không thể kết luận đúng/sai nếu không so khớp chính xác loại lỗ hổng rule tuyên bố với hành vi thật của code.",
+    "confidence": "medium"
+  },
+  "JS-0015": {
+    "label": "FP",
+    "reason": "Cùng pattern chặn '/' trước res.sendFile như JS-0014 (keyServer.ts), không có cutOffPoisonNullByte nên còn an toàn hơn cả fileServer.ts.",
+    "context_needed": "Giống JS-0014.",
+    "confidence": "high"
+  },
+  "JS-0016": {
+    "label": "FP",
+    "reason": "Cùng pattern chặn '/' như JS-0014/15 (logfileServer.ts).",
+    "context_needed": "Giống JS-0014.",
+    "confidence": "high"
+  },
+  "JS-0017": {
+    "label": "TP",
+    "reason": "models.sequelize.query() dùng template literal nối trực tiếp req.body.email và security.hash(req.body.password) vào câu SQL — SQL injection thật ở endpoint login (đây chính là các challenge loginAdminChallenge/loginBenderChallenge/loginJimChallenge kinh điển của Juice Shop).",
+    "context_needed": "Không cần thêm — source/sink rõ ràng trong cùng 1 dòng.",
+    "confidence": "high"
+  },
+  "JS-0018": { "label": "TP", "reason": "Cùng dòng với JS-0017, bị rule tainted-sql-string flag thêm.", "context_needed": "Giống JS-0017.", "confidence": "high" },
+  "JS-0022": {
+    "label": "TP",
+    "reason": "security.isRedirectAllowed(toUrl) tưởng là allowlist an toàn nhưng bên trong dùng url.includes(allowedUrl) THAY VÌ so khớp chính xác/kiểm tra origin. Một URL như 'https://evil.com/?x=https://github.com/juice-shop/juice-shop' vẫn chứa chuỗi allowlist làm substring nên qua được check, rồi res.redirect() tới toàn bộ URL độc hại. Đây chính là redirectChallenge cố ý — allowlist bị implement sai (substring match thay vì exact/prefix match).",
+    "context_needed": "Phải đọc ĐỊNH NGHĨA của isRedirectAllowed() trong lib/insecurity.ts (không chỉ thấy tên hàm 'isRedirectAllowed' rồi vội kết luận an toàn) để thấy .includes() là lỗi logic — ví dụ điển hình 'có sanitizer nhưng sanitizer bị lỗi'.",
+    "confidence": "high"
+  },
+  "JS-0023": { "label": "TP", "reason": "Cùng route/dòng với JS-0022, bị rule express-open-redirect flag thêm.", "context_needed": "Giống JS-0022.", "confidence": "high" },
+  "JS-0024": {
+    "label": "TP",
+    "reason": "criteria lấy từ req.query.q, chỉ giới hạn độ dài (200 ký tự) chứ không escape/tham số hoá, rồi nối thẳng vào câu SQL thô. Đây chính là unionSqlInjectionChallenge/dbSchemaChallenge cố ý của Juice Shop (comment ngay trong code xác nhận).",
+    "context_needed": "Không cần thêm — source/sink rõ trong cùng hàm, tên biến/comment đã tự giải thích.",
+    "confidence": "high"
+  },
+  "JS-0025": { "label": "TP", "reason": "Cùng dòng với JS-0024, bị rule tainted-sql-string flag thêm.", "context_needed": "Giống JS-0024.", "confidence": "high" },
+  "JS-0027": {
+    "label": "TP",
+    "reason": "username của user (có thể set khi đăng ký/update profile) được match với pattern #{(.*)} rồi phần bên trong bị eval() trực tiếp (dòng 65). Đây là Server-Side Template Injection dẫn tới RCE qua trường username — chính là usernameXssChallenge cố ý.",
+    "context_needed": "Đọc toàn bộ khối if (dòng 57-77) để thấy username thực sự được dùng làm code eval, không chỉ hiển thị — nếu chỉ đọc 1 dòng snippet dễ tưởng đây chỉ là string replace thông thường.",
+    "confidence": "high"
+  },
+  "JS-0028": { "label": "TP", "reason": "Cùng dòng eval(code) với JS-0027, bị rule eval-detected flag thêm.", "context_needed": "Giống JS-0027.", "confidence": "high" },
+  "JS-0020": {
+    "label": "FP",
+    "reason": "Cùng pattern chặn '/' như JS-0014/15/16 (quarantineServer.ts).",
+    "context_needed": "Giống JS-0014.",
+    "confidence": "high"
+  },
+  "JS-0030": {
+    "label": "FP",
+    "reason": "subs = getSubsFromFile() đọc file .vtt tại đường dẫn xây từ config.get('application.promotion.subtitles') — giá trị này CHỈ được set lúc khởi động server qua lib/startup/customizeApplication.ts (retrieveCustomFile, đọc từ file config YAML), KHÔNG có route/handler nào cho phép client set giá trị này qua request. Grep toàn bộ routes/ và lib/ không tìm thấy nơi nào khác ghi vào key config này.",
+    "context_needed": "Grep toàn bộ codebase tìm nơi 'application.promotion.subtitles' được set, không chỉ đọc nơi nó được dùng — nếu chỉ đọc videoHandler.ts sẽ không biết nguồn gốc giá trị. LƯU Ý: có challenge 'videoXssChallenge' gắn với biến này, gợi ý nó ĐƯỢC THIẾT KẾ để có thể khai thác — nhiều khả năng qua kịch bản operator tự cấu hình file .vtt độc hại (self-XSS mang tính minh hoạ), không phải qua tấn công từ xa của attacker vào 1 endpoint.",
+    "confidence": "medium"
+  },
+  "JS-0031": {
+    "label": "FP",
+    "reason": "console.error('...' + name, err) — name là tham số của collectDurationPromise(name, func), grep toàn bộ 5 nơi gọi hàm này trong server.ts đều truyền literal cố định ('validatePreconditions', 'cleanupFtpFolder', ...), không có nơi nào truyền giá trị từ request.",
+    "context_needed": "Grep tất cả lời gọi collectDurationPromise() để xác nhận tham số name luôn là literal, không phải chỉ đọc định nghĩa hàm.",
+    "confidence": "high"
+  }
+}

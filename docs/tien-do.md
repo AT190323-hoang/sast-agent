@@ -65,7 +65,7 @@ xem `dataset/labels/missing_control.json`.
 | T1.3 | Custom rule cho 2 nhóm còn thiếu | ✅ | 4 rule đã sửa lỗi + validate sạch. Scan Juice Shop: 25 candidate `missing_control` + 7 candidate `broken_invariant` |
 | T1.4 | Mở rộng nguồn finding (crAPI) | ✅ | Clone xong. Scan `workshop` (Django, 7 finding) + `identity` (Java, 4 finding) bằng registry pack. Chưa viết custom rule riêng cho BOLA/BFLA của crAPI — để dành khi gán nhãn (T1.6) đọc trực tiếp `shop/views.py`/`mechanic/views.py`, đây là nơi có ví dụ BOLA kinh điển |
 | T1.5 | Schema dataset + script chuẩn hoá | ✅ | `dataset/scripts/normalize_findings.py` gộp 5 file, dedupe theo (app, file, dòng, rule_id), map rule→nhóm qua bảng tường minh (rule lạ sẽ báo `UNCLASSIFIED` thay vì đoán). Output: `dataset/findings_draft.json` — 71 finding (missing_control 26, taint_flow 23, insecure_property 15, broken_invariant 7) |
-| T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | 🔶 | 33/71 xong (`broken_invariant`: 2 TP/5 FP — dưới ngưỡng 10, cần bổ sung; `missing_control`: 2 TP/24 FP — đủ ngưỡng, tỷ lệ lệch mạnh về FP nhưng đúng thực tế đã kiểm chứng). Còn `taint_flow` (23) + `insecure_property` (15) |
+| T1.6 | Gán nhãn TP/FP + lý do + `context_needed` | 🔶 | **71/71 xong.** `taint_flow` 12 TP/11 FP (cân bằng). `insecure_property` 13 TP/2 FP (rule registry khá chính xác cho nhóm này, ít nhiễu). `missing_control` 2 TP/24 FP (rule custom rất noisy nhưng đúng thực tế, đã tách 5 loại nguyên nhân FP). `broken_invariant` 2 TP/5 FP — **dưới ngưỡng 10, cần bổ sung thêm ~3-5 finding** trước khi freeze |
 | T1.7 | Viết `docs/taxonomy.md` | ⬜ | Đã có sẵn ví dụ thật cho `missing_control` |
 | T1.8 | Review: ≥10 finding/nhóm, không mơ hồ | ⬜ | |
 | T1.9 | Freeze dataset v1 + báo cáo tuần 1 | ⬜ | |

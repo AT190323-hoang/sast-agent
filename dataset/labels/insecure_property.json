@@ -1,0 +1,92 @@
+{
+  "CRAPI-0001": {
+    "label": "FP",
+    "reason": "http.csrf().disable() nhưng API này dùng sessionCreationPolicy(STATELESS) + JWT filter (addFilterBefore(authenticationJwtTokenFilter(), ...)), không dùng session cookie để xác thực. CSRF chỉ có ý nghĩa khi browser TỰ ĐỘNG đính kèm credential (cookie) vào cross-site request — JWT gửi qua header Authorization không bị trình duyệt tự động đính kèm như vậy, nên tắt CSRF là thực hành đúng chuẩn cho REST API dùng bearer token, không phải lỗ hổng.",
+    "context_needed": "Phải đọc toàn bộ SecurityFilterChain (sessionCreationPolicy, JWT filter) để biết cơ chế xác thực thực tế là token-based hay cookie-based — nếu chỉ thấy dòng csrf().disable() sẽ mặc định cho là thiếu sót.",
+    "confidence": "high"
+  },
+  "CRAPI-0002": {
+    "label": "TP",
+    "reason": "restTemplate() dùng TrustAllStrategy (tin mọi certificate, dòng 70-72) kết hợp NoopHostnameVerifier.INSTANCE (không kiểm tra hostname, dòng 74) khi gọi apiGatewayURL kèm basic auth credential thật (apiGatewayUsername/apiGatewayPassword, dòng 82). Đây không phải code test — là service implementation thật, khiến kết nối tới API gateway dễ bị MITM đánh cắp credential.",
+    "context_needed": "Đọc toàn bộ hàm restTemplate() để thấy TrustAllStrategy + NoopHostnameVerifier đi cùng nhau và được dùng để gửi basic-auth credential thật — không chỉ đọc riêng dòng NoopHostnameVerifier.",
+    "confidence": "high"
+  },
+  "CRAPI-0003": {
+    "label": "TP",
+    "reason": "Cùng hàm restTemplate() với CRAPI-0002 — toàn bộ SSLContext được dựng từ TrustAllStrategy, không giới hạn phiên bản TLS an toàn. Cùng root cause với CRAPI-0002 (cấu hình SSL bị vô hiệu hoá hoàn toàn cho service này).",
+    "context_needed": "Giống CRAPI-0002.",
+    "confidence": "high"
+  },
+  "CRAPI-0004": {
+    "label": "TP",
+    "reason": "File PEM private key thật (-----BEGIN PRIVATE KEY-----) được commit vào repo tại services/identity/src/main/resources/certs/server.key, và ĐƯỢC SỬ DỤNG THẬT (keystore.sh dùng chính file này để tạo server.keystore cho service identity, mật khẩu keystore hardcode 'passw0rd'). .gitignore có dòng 'services/certs/' nhưng KHÔNG khớp đường dẫn thật của file (services/identity/src/main/resources/certs/) nên không loại trừ được — key này đang lộ công khai trong git history.",
+    "context_needed": "Kiểm tra file có thực sự được dùng bởi service nào không (đọc keystore.sh) và kiểm tra .gitignore có thực sự loại trừ được đường dẫn này không (dễ nhầm nếu chỉ thấy có dòng gitignore nhắc tới 'certs' mà không so khớp path chính xác).",
+    "confidence": "high"
+  },
+  "CRAPI-0005": {
+    "label": "FP",
+    "reason": "@csrf_exempt áp dụng cho SignUpView.post — đây là endpoint ĐĂNG KÝ MECHANIC MỚI, hoàn toàn public, không có phiên đăng nhập nào tồn tại trước đó để CSRF có thể lợi dụng (CSRF khai thác việc giả mạo hành động thay mặt một session đã xác thực). grep toàn bộ settings.py không thấy cấu hình DEFAULT_AUTHENTICATION_CLASSES dùng session — API chủ yếu dùng JWT/token, càng củng cố việc miễn CSRF ở đây là hợp lý.",
+    "context_needed": "Hiểu bản chất nghiệp vụ của view (đăng ký mới, không có session để bảo vệ) — quan trọng hơn cả việc kiểm tra loại authentication class, vì kể cả có session auth thì 1 endpoint đăng ký công khai vẫn không có gì để CSRF nhắm vào.",
+    "confidence": "high"
+  },
+  "CRAPI-0007": {
+    "label": "TP",
+    "reason": "requests.get(request_url, ..., headers={'Authorization': request.META.get('HTTP_AUTHORIZATION')}, verify=False) — request_url lấy TRỰC TIẾP từ request_data['mechanic_api'] (attacker-controlled), verify=False tắt xác thực chứng chỉ TLS, và Authorization header của CHÍNH NGƯỜI GỌI bị forward tới URL đó. Kết hợp lại: SSRF + có thể đánh cắp Authorization header qua MITM (verify=False cho phép attacker dùng cert tự ký ở URL độc hại mà vẫn được request chấp nhận). Vượt xa mức 1 finding insecure_property đơn thuần.",
+    "context_needed": "Đọc toàn bộ khối try/while để thấy request_url đến từ request_data (không phải cấu hình cố định) và Authorization header bị forward — nếu chỉ thấy verify=False đơn lẻ dễ đánh giá thấp mức độ nghiêm trọng thật.",
+    "confidence": "high"
+  },
+  "CRAPI-0008": {
+    "label": "TP",
+    "reason": "requests.post(gateway_endpoint, headers={'Authorization': gateway_credential, ...}, verify=False). Khác CRAPI-0007 ở chỗ gateway_endpoint lấy từ settings.API_GATEWAY_URL (cố định, không phải SSRF), nhưng verify=False vẫn khiến gateway_credential (Basic Auth thật của hệ thống) có thể bị đánh cắp qua MITM nếu attacker có vị trí mạng phù hợp (nội bộ container network, DNS hijack hostname gateway...). Vẫn là rủi ro thật dù thấp hơn CRAPI-0007.",
+    "context_needed": "Phân biệt được 2 case tưởng giống nhau (cùng rule disabled-cert-validation) nhưng khác mức độ nghiêm trọng vì nguồn gốc URL đích khác nhau (fixed config vs request-controlled).",
+    "confidence": "high"
+  },
+  "JS-0004": {
+    "label": "TP",
+    "reason": "hmac() dùng key hardcode 'pa4qacea4VK9t9nGv7yZtwmj' — dùng thật để tạo/kiểm mã coupon (generateCoupon/discountFromCoupon trong cùng file). Ai đọc được source code (open-source) đều có thể tự sinh coupon hợp lệ.",
+    "context_needed": "Xem hàm này có được dùng cho mục đích bảo mật thật không (không phải hardcode key chỉ dùng cho test) — grep nơi gọi hmac().",
+    "confidence": "high"
+  },
+  "JS-0005": {
+    "label": "TP",
+    "reason": "privateKey là chuỗi RSA PEM hardcode ngay đầu file (lib/insecurity.ts), dùng thật để ký JWT (jwt.sign(user, privateKey, {algorithm: 'RS256'})) cấp quyền truy cập cho user. Vì source code Juice Shop công khai, bất kỳ ai cũng có key này và có thể tự ký JWT giả mạo bất kỳ user/role nào.",
+    "context_needed": "Xác nhận privateKey được dùng để ký token thật (không phải chỉ demo/test) bằng cách theo dõi authorize().",
+    "confidence": "high"
+  },
+  "JS-0006": {
+    "label": "TP",
+    "reason": "deluxeToken() dùng lại chính privateKey (đã hardcode, dùng chung với JS-0005) làm HMAC key để tạo token nâng cấp tài khoản Deluxe — cùng root cause với JS-0005, hardcode secret dùng cho mục đích bảo mật thật (phân quyền deluxe).",
+    "context_needed": "Giống JS-0005 — xác nhận secret được tái sử dụng cho một cơ chế bảo mật khác trong cùng file.",
+    "confidence": "high"
+  },
+  "JS-0032": {
+    "label": "TP",
+    "reason": "app.use('/infrastructure', serveIndexMiddleware, serveIndex('infrastructure', {...})) — bật liệt kê thư mục thật cho /infrastructure (chứa file .tf, Dockerfile...). Có thể lộ thông tin hạ tầng.",
+    "context_needed": "Xác nhận serveIndex thực sự được đăng ký active (không bị gate bởi flag môi trường nào) — đọc trực tiếp dòng đăng ký route.",
+    "confidence": "high"
+  },
+  "JS-0033": {
+    "label": "TP",
+    "reason": "app.use('/ftp', serveIndexMiddleware, serveIndex('ftp', ...)) — nằm trong khối comment 'vuln-code-snippet start directoryListingChallenge', xác nhận đây là lỗ hổng liệt kê thư mục cố ý (directoryListingChallenge).",
+    "context_needed": "Đọc comment vuln-code-snippet bao quanh để xác nhận đây đúng là 1 challenge có chủ đích, không phải misconfiguration ngẫu nhiên.",
+    "confidence": "high"
+  },
+  "JS-0034": {
+    "label": "TP",
+    "reason": "app.use('/.well-known', serveIndexMiddleware, serveIndex('.well-known', ...)) — cùng khối directoryListingChallenge với JS-0033.",
+    "context_needed": "Giống JS-0033.",
+    "confidence": "high"
+  },
+  "JS-0035": {
+    "label": "TP",
+    "reason": "app.use('/encryptionkeys', serveIndexMiddleware, serveIndex('encryptionkeys', ...)) — liệt kê thư mục chứa các file khoá mã hoá của app, nghiêm trọng hơn các case khác vì lộ trực tiếp tên file khoá.",
+    "context_needed": "Giống JS-0033 — cùng pattern serveIndex.",
+    "confidence": "high"
+  },
+  "JS-0036": {
+    "label": "TP",
+    "reason": "app.use('/support/logs', serveIndexMiddleware, serveIndex('logs', ...)) — nằm trong comment 'vuln-code-snippet ... accessLogDisclosureChallenge', xác nhận cố ý lộ log truy cập.",
+    "context_needed": "Giống JS-0033.",
+    "confidence": "high"
+  }
+}
