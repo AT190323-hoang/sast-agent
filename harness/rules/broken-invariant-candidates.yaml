@@ -1,0 +1,35 @@
+rules:
+  - id: custom.broken-invariant.json-parse-without-trycatch
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >
+      JSON.parse() call not wrapped in a try/catch. If the input is not
+      guaranteed to be well-formed JSON, this throws and can crash the
+      handler/process. Verify whether the caller already guarantees valid
+      JSON (an implicit invariant) before concluding this is a true positive.
+    metadata:
+      taxonomy: broken_invariant
+    patterns:
+      - pattern: JSON.parse($X)
+      - pattern-not-inside: |
+          try {
+            ...
+          } catch ($ERR) {
+            ...
+          }
+
+  - id: custom.broken-invariant.chained-optional-access-no-null-check
+    languages: [typescript, javascript]
+    severity: INFO
+    message: >
+      Chained property access (e.g. tokenMap[...].data.id) on a lookup result
+      that is not narrowed with an explicit null/undefined check or optional
+      chaining. Verify whether an earlier invariant (prior validation,
+      try/catch, middleware) already guarantees non-null before concluding
+      this is a true positive.
+    metadata:
+      taxonomy: broken_invariant
+    patterns:
+      - pattern-either:
+          - pattern: "$MAP[$KEY].$PROP1.$PROP2"
+      - pattern-not: "$MAP[$KEY]?.$PROP1?.$PROP2"

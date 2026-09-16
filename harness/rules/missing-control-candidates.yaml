@@ -1,0 +1,40 @@
+rules:
+  - id: custom.missing-control.mutation-by-request-id
+    languages: [typescript, javascript]
+    severity: WARNING
+    message: >
+      Sequelize record is deleted/updated using a request-controlled identifier
+      (req.params or req.body). Verify that an authorization/ownership guard is
+      bound to this route (possibly in server.ts, not in this file) before
+      concluding this is a missing_control true positive.
+    metadata:
+      taxonomy: missing_control
+    patterns:
+      - pattern-either:
+          - pattern: "$MODEL.destroy({ where: { $KEY: $REQ.params.$ID } })"
+          - pattern: "$MODEL.destroy({ where: { $KEY: $REQ.params.$ID, ... } })"
+          - pattern: "$MODEL.update($DATA, { where: { $KEY: $REQ.params.$ID } })"
+          - pattern: "$MODEL.update($DATA, { where: { $KEY: $REQ.params.$ID, ... } })"
+          - pattern: "$VAR.update($DATA)"
+      - metavariable-pattern:
+          metavariable: $REQ
+          patterns:
+            - pattern: req
+
+  - id: custom.missing-control.route-without-visible-guard
+    languages: [typescript, javascript]
+    severity: INFO
+    message: >
+      Express route registered without an isAuthorized/denyAll/appendUserId/isAccounting
+      guard argument in this call. Check server.ts for a path-prefix middleware that
+      may guard this route elsewhere before concluding missing_control.
+    metadata:
+      taxonomy: missing_control
+    patterns:
+      - pattern-either:
+          - pattern: "app.put($PATH, $HANDLER)"
+          - pattern: "app.delete($PATH, $HANDLER)"
+          - pattern: "app.post($PATH, $HANDLER)"
+      - pattern-not: "app.put($PATH, security.$GUARD(), ...)"
+      - pattern-not: "app.delete($PATH, security.$GUARD(), ...)"
+      - pattern-not: "app.post($PATH, security.$GUARD(), ...)"
