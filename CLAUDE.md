@@ -94,7 +94,8 @@ trong JSON output, đừng chỉ nhìn số lượng results.
 
 ## 6. Đang làm tới đâu?
 
-→ Xem `docs/tien-do.md`. Tóm tắt nhanh tại thời điểm viết file này: **đang ở Tuần 1**, đã cài
-xong Opengrep + fix lỗi CA, đã có ~43 finding thô từ Juice Shop (chủ yếu `taint_flow` và
-`insecure_property`), đang thiếu finding cho `missing_control` và `broken_invariant`, chưa gán
-nhãn TP/FP, chưa viết `docs/taxonomy.md`.
+→ Xem `docs/tien-do.md`. Tóm tắt nhanh tại thời điểm viết file này: **Tuần 1 đã hoàn thành**
+(dataset `dataset/findings_v1.json` — 87 finding, 4 nhóm đều ≥10 TP+FP — đã freeze;
+`docs/taxonomy.md` + `reports/week1/bao-cao-tuan-1.md` đã viết xong). **Đang chuyển sang
+Tuần 2** — xây dựng harness cho AI agent. Đọc `dataset/README.md` trước khi dùng dataset để đo
+accuracy agent (có vài lưu ý phương pháp luận quan trọng, đặc biệt về giới hạn recall).

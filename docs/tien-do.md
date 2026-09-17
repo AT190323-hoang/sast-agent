@@ -3,45 +3,36 @@
 > **Cập nhật file này vào cuối mỗi phiên làm việc.** Phiên Claude mới đọc `CLAUDE.md` → rồi
 > file này → biết ngay đang ở đâu, việc tiếp theo là gì.
 
-**Tuần hiện tại:** Tuần 1 — Thu thập dữ liệu & Taxonomy
-**Cập nhật lần cuối:** 16/09/2026
+**Tuần hiện tại:** Tuần 2 — Xây dựng Harness Cho AI Agent (Tuần 1 đã xong)
+**Cập nhật lần cuối:** 17/09/2026
 
 ---
 
-## ⭐ Phát hiện quan trọng khi gán nhãn `missing_control` (16/09)
+## ✅ Tuần 1 hoàn thành (17/09)
 
-Case kinh điển nhất của Juice Shop (guard `security.isAuthorized()` bị comment out ở
-`server.ts:389` cho `PUT /api/Products/:id`) **không nằm trong dataset**, dù đã quét bằng cả
-registry rule lẫn custom rule. Lý do: route đó không tồn tại như một câu lệnh `app.put(...)`
-tường minh — nó được **sinh tự động** bởi `finale.initialize({ app, sequelize: seq })` +
-mảng `autoModels` (server.ts:500-522, thư viện REST scaffolding cho Sequelize model). Đây là
-loại blind-spot **hoàn toàn khác** với "guard nằm ở file khác": không phải agent thiếu context
-để verify, mà là **không có finding nào để verify từ đầu** (vấn đề recall của rule, xảy ra
-trước cả bước SAST chạy). Đáng đưa vào tài liệu root-cause Tuần 4 như một giới hạn cần nêu rõ,
-nhưng **không đưa vào dataset** vì không có tool nào thực sự tạo ra finding này (giữ đúng
-nguyên tắc "dataset gồm finding do tool sinh ra", không tự chèn case biết trước đáp án).
+87 finding, cả 4 nhóm đạt ngưỡng ≥10 (TP+FP). Dataset đã freeze tại `dataset/findings_v1.json`.
+Báo cáo đầy đủ: `reports/week1/bao-cao-tuan-1.md`. Phương pháp luận + lưu ý khi dùng dataset:
+`dataset/README.md` — **đọc file này trước khi bắt đầu đo accuracy agent ở Tuần 2+**, đặc biệt
+mục "quy trình gán ground truth khác quy trình agent bị kiểm tra" và "dataset chỉ phản ánh
+recall của bộ rule đã dùng".
 
-Ngoài ra, khi gán nhãn 26 candidate `missing_control`, chỉ 2 là TP thật — 24 còn lại là FP
-nhưng tách được **5 nguyên nhân FP khác nhau** (guard qua path-prefix middleware trong cùng
-file; guard qua ownership-filter với giá trị bị middleware ghi đè trước khi tới handler; guard
-nằm inline trong handler ở file route riêng; endpoint public-by-design theo nghiệp vụ; endpoint
-thao tác state toàn cục không gắn với user cụ thể). Chi tiết đầy đủ + dẫn chứng từng dòng code:
-xem `dataset/labels/missing_control.json`.
+Việc còn treo từ Tuần 1 (không chặn Tuần 2): mentor/người thứ hai chưa review độc lập mẫu nhãn
+nào — nếu có thời gian, nên làm song song với Tuần 2 chứ không cần chặn lại.
 
-## Việc tiếp theo cần làm
+## Việc tiếp theo cần làm (Tuần 2)
 
-1. Gán nhãn nốt `taint_flow` (23 candidate) và `insecure_property` (15 candidate) — chạy
-   `python3 dataset/scripts/apply_labels.py` sau khi thêm mỗi file `dataset/labels/<nhóm>.json`.
-2. Xử lý khoảng trống `broken_invariant` (7 candidate, cần ≥10): cân nhắc quét thêm service
-   `chatbot` (Python) của crAPI, hoặc viết thêm 1 custom rule (resource không đóng, Django
-   `.get()` có thể raise `DoesNotExist` không bắt).
-3. **Chốt quy ước TP/FP** cho app cố ý chứa lỗi (câu hỏi #1 Tuần 1 — chưa chốt) và hỏi mentor
-   về việc review nhãn (câu hỏi #4 — chưa chốt).
-4. Viết `docs/taxonomy.md` (T1.7) — đã có rất nhiều ví dụ thật + lý do cụ thể trong
-   `dataset/labels/*.json`, chỉ cần tổng hợp lại.
-5. Review toàn bộ dataset đã gán nhãn (T1.8), rồi freeze thành `dataset/findings_v1.json` +
-   viết `reports/week1/bao-cao-tuan-1.md` (T1.9).
-6. Sau khi Tuần 1 xong: khảo sát agent-harness repo có sẵn cho Tuần 2 (T2.0).
+1. **T2.0** — khảo sát agent-harness repo có sẵn trên GitHub (ReAct-style tool-calling loop,
+   Claude Agent SDK...), chọn 1 cái để build tiếp thay vì viết từ đầu.
+2. **T2.1** — cài `node`/`npm` (vẫn đang thiếu — xem `docs/moi-truong-va-cong-cu.md` mục 5).
+3. **T2.2** — dựng codebase-memory-mcp, kiểm tra nó có hỗ trợ tìm caller/route table không (cần
+   biết sớm cho Tuần 4-5, xem câu hỏi #2 Tuần 2 trong `docs/ke-hoach-6-tuan.md`).
+4. **T2.3-T2.6** — grep/read_file tool, vòng lặp verify, prompt lõi v0, logging đầy đủ.
+5. **T2.8** — thiết kế thí nghiệm no-tool vs with-tool **ngay từ đầu**, không để cuối tuần mới
+   tìm bằng chứng "harness thực sự cần thiết".
+6. Thiết kế prompt/tool theo hướng **tổng quát hoá** (chiến lược điều tra, không hardcode theo
+   pattern cụ thể đã thấy ở Juice Shop/crAPI) — xem thảo luận chi tiết trong lịch sử phiên làm
+   việc 17/09, nên tận dụng việc dataset đã có 2 hệ sinh thái khác nhau (Node vs Django/Java)
+   làm phép kiểm tra tổng quát hoá miễn phí khi tune prompt từng nhóm ở Tuần 3-5.
 
 ---
 
@@ -49,8 +40,8 @@ xem `dataset/labels/missing_control.json`.
 
 | Tuần | Chủ đề | Trạng thái |
 |---|---|---|
-| 1 | Thu thập dữ liệu & Taxonomy | 🔶 Đang làm (~30%) |
-| 2 | Xây dựng harness | ⬜ Chưa bắt đầu |
+| 1 | Thu thập dữ liệu & Taxonomy | ✅ Hoàn thành |
+| 2 | Xây dựng harness | 🔶 Đang làm |
 | 3 | `taint_flow` root-cause | ⬜ Chưa bắt đầu |
 | 4 | `missing_control` + `insecure_property` | ⬜ Chưa bắt đầu |
 | 5 | `broken_invariant` | ⬜ Chưa bắt đầu |
@@ -97,12 +88,43 @@ xem `dataset/labels/missing_control.json`.
 |---|---|---|---|
 | 🔴 Cao | `node`/`npm` chưa cài trên máy | Chặn codebase-memory-mcp (Tuần 2) và chạy Juice Shop thật | Cần cài trước Tuần 2, `sudo` cần mật khẩu nên user phải tự chạy |
 | ✅ Đã xử lý (16/09) | Registry rule pack gần như không có rule cho `missing_control` / `broken_invariant` | — | Viết + sửa xong 4 custom Opengrep rule (T1.3), scan ra 25 candidate `missing_control` + 7 candidate `broken_invariant` |
-| 🟡 Vừa | 7 candidate `broken_invariant` hơi ít, chưa chắc đủ cả TP lẫn FP sau khi gán nhãn | Có thể thiếu case cho nhóm này | Xem lại sau khi gán nhãn; cân nhắc WebGoat (Java) hoặc thêm custom rule nếu thiếu |
+| ✅ Đã xử lý (16/09) | 7 candidate `broken_invariant` không đủ ngưỡng | — | Viết thêm rule Django `.get()` không try/except, quét crAPI → 23 candidate, 13 TP/10 FP |
 | ✅ Đã xử lý (16/09) | Docker chưa bật WSL integration | — | Thực ra đã bật sẵn từ trước; chỉ cần `sg docker -c "..."` do shell hiện tại chưa nạp lại group `docker` |
 
 ---
 
 ## Nhật ký phiên làm việc
+
+### Phiên 4 — 17/09/2026
+- Hoàn thành T1.6 (gán nhãn `taint_flow` 12/11, `insecure_property` 13/2), phát hiện
+  `broken_invariant` thiếu (7 candidate) → viết thêm custom rule Django `.get()` không
+  try/except, quét crAPI, gán nhãn 16 case mới (11 TP/5 FP) → nhóm đạt 23 (13 TP/10 FP).
+  Trong lúc gán nhãn phát hiện chính custom rule của mình có 1 false-negative
+  (`except $EXC:` không khớp `except $EXC as $NAME:`), đã sửa rule nhưng giữ nguyên case cũ
+  trong dataset làm bằng chứng.
+- Sửa `normalize_findings.py` để giữ nguyên id cũ khi chạy lại (tránh corrupt mapping nhãn khi
+  bổ sung finding mới) — bug này suýt xảy ra khi thêm 16 finding mới cho `broken_invariant`.
+- Viết `docs/taxonomy.md` (T1.7): định nghĩa 4 nhóm + 3 quy tắc phân định ranh giới + ví dụ
+  TP/FP thật kèm code cho từng nhóm.
+- Tự review (T1.8): kiểm tra tự động (field đầy đủ, không trùng id, nhãn nhất quán giữa
+  finding cùng vị trí, rule→nhóm khớp taxonomy, CWE/severity hợp lý) — không phát hiện lỗi cần
+  sửa. Xác nhận quy ước TP/FP (câu hỏi #1 Tuần 1) coi như đã chốt qua thực hành nhất quán,
+  không cần bàn thêm.
+- User hỏi sâu về rủi ro overfitting: bộ custom rule Tuần 1 không bao quát hết pattern, nên
+  tool/prompt xây ở Tuần 2-5 có thể chỉ giải quyết đúng hình dạng mà rule Tuần 1 từng bắt được.
+  Đã thảo luận hướng xử lý: tách "năng lực tổng quát" (tool grep/read/search + kiến thức nền
+  LLM) khỏi "kiến thức về case cụ thể" (ví dụ few-shot), viết prompt dạng câu hỏi điều tra thay
+  vì tên hàm/pattern cụ thể, và tận dụng việc dataset đã có 2 hệ sinh thái (Node vs Django/Java)
+  làm phép kiểm tra tổng quát hoá miễn phí khi tune ở Tuần 3-5. Chưa ghi chi tiết vào
+  `ke-hoach-6-tuan.md` (user chưa yêu cầu), chỉ tóm tắt ở đây.
+- Bàn về việc ai review nhãn độc lập (câu hỏi #4 Tuần 1) — kết luận: AI tự review lại chính
+  mình không tính là review chéo thật sự (cùng kiến thức nền, lặp lại đúng lỗi nếu có). Đề xuất
+  mentor hoặc chính user xem qua mẫu nhỏ (~5-15 case), ưu tiên case `confidence: medium`. Chưa
+  chốt, để mở sang Tuần 2.
+- Hoàn thành T1.9: freeze `dataset/findings_v1.json`, viết `dataset/README.md` (phương pháp
+  luận: quy trình gán nhãn khác quy trình agent, giới hạn recall của bộ rule, nguyên tắc custom
+  rule cục bộ, versioning), viết `reports/week1/bao-cao-tuan-1.md`. **Tuần 1 chính thức hoàn
+  thành**, chuyển sang Tuần 2.
 
 ### Phiên 3 — 16/09/2026
 - User hỏi đánh giá giáo trình 6 tuần cho mentor: nêu rủi ro chính là cỡ mẫu nhỏ khó chứng
