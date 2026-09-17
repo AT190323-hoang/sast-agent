@@ -132,7 +132,13 @@ ghi chung chung kiểu "cần thêm context" — phải ghi rõ dạng *"cần b
 > - ✅ **Phạm vi scan: chỉ backend Juice Shop**, loại `test/` và `data/` seed (bổ sung cho câu #1).
 > - ✅ **Được dùng custom rule**, bắt buộc ghi `rule_source: registry|custom` (câu #3).
 >
-> Còn lại **chưa chốt**: câu #1 (quy ước TP/FP chi tiết) và câu #4 (ai review nhãn).
+> **Đã chốt ngày 17/09 (xác nhận qua thực hành, không chỉ bàn lý thuyết):**
+> - ✅ **Câu #1 — quy ước TP/FP** — định nghĩa đề xuất bên dưới đã được áp dụng nhất quán cho
+>   toàn bộ 87 finding (xem `dataset/labels/*.json`), qua review T1.8 không phát hiện case nào
+>   mơ hồ hay áp dụng sai lệch. Coi như đã kiểm chứng bằng thực hành thay vì chỉ thống nhất
+>   bằng lời.
+>
+> Còn lại **chưa chốt**: câu #4 (ai review nhãn — mentor hay tự review chéo).
 
 1. **Quy ước TP/FP cho app cố ý chứa lỗi.** Juice Shop cố tình nhúng lỗ hổng, nên cần định
    nghĩa rõ, đề xuất:
