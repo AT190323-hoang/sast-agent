@@ -83,7 +83,7 @@
     "file": "services/identity/src/main/resources/certs/server.key",
     "start_line": 1,
     "end_line": 2,
-    "code_snippet": "-----BEGIN PRIVATE KEY-----\nMIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQD17BcGoFYiZupD",
+    "code_snippet": "[REDACTED by vinsoc-sast-agent: private key literal removed before publishing — see dataset/labels/insecure_property.json for the finding's description]",
     "tool_message": "Private Key detected. This is a sensitive credential and should not be hardcoded here. Instead, store this in a separate, private file.",
     "label": "TP",
     "reason": "File PEM private key thật (-----BEGIN PRIVATE KEY-----) được commit vào repo tại services/identity/src/main/resources/certs/server.key, và ĐƯỢC SỬ DỤNG THẬT (keystore.sh dùng chính file này để tạo server.keystore cho service identity, mật khẩu keystore hardcode 'passw0rd'). .gitignore có dòng 'services/certs/' nhưng KHÔNG khớp đường dẫn thật của file (services/identity/src/main/resources/certs/) nên không loại trừ được — key này đang lộ công khai trong git history.",

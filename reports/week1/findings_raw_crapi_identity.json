@@ -1,1 +1,401 @@
-{"version":"1.30.0","results":[{"check_id":"java.spring.security.audit.spring-csrf-disabled.spring-csrf-disabled","path":"/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/WebSecurityConfig.java","start":{"line":98,"col":5,"offset":4046},"end":{"line":98,"col":26,"offset":4067},"extra":{"metavars":{"$OBJ":{"start":{"line":98,"col":5,"offset":4046},"end":{"line":98,"col":9,"offset":4050},"abstract_content":"http"}},"message":"CSRF protection is disabled for this configuration. This is a security risk.","metadata":{"cwe":["CWE-352: Cross-Site Request Forgery (CSRF)"],"owasp":["A01:2021 - Broken Access Control","A01:2025 - Broken Access Control"],"source-rule-url":"https://find-sec-bugs.github.io/bugs.htm#SPRING_CSRF_PROTECTION_DISABLED","asvs":{"control_id":"4.2.2 CSRF","control_url":"https://github.com/OWASP/ASVS/blob/master/4.0/en/0x12-V4-Access-Control.md#v42-operation-level-access-control","section":"V4 Access Control","version":"4"},"category":"security","technology":["spring"],"references":["https://owasp.org/Top10/A01_2021-Broken_Access_Control"],"cwe2022-top25":true,"cwe2021-top25":true,"subcategory":["audit"],"likelihood":"LOW","impact":"MEDIUM","confidence":"LOW","license":"Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license","vulnerability_class":["Cross-Site Request Forgery (CSRF)"],"source":"https://semgrep.dev/r/java.spring.security.audit.spring-csrf-disabled.spring-csrf-disabled","shortlink":"https://sg.run/jRnl","semgrep.dev":{"rule":{"origin":"community","r_id":9221,"rule_id":"OrU3gK","rv_id":1263080,"url":"https://semgrep.dev/playground/r/vdT06dL/java.spring.security.audit.spring-csrf-disabled.spring-csrf-disabled","version_id":"vdT06dL"}}},"severity":"WARNING","fingerprint":"3a3c5b631bf3bce75e55698042c0b390f41851f28a9d074247162a586a90bf81109f71a71eec16f1e23ad17eeb9dc8c1c0d18ab2c8616b35a337f21ae123c3a5_0","lines":"    http.csrf().disable();","is_ignored":false,"validation_state":"NO_VALIDATOR","engine_kind":"OSS"}},{"check_id":"java.lang.security.audit.crypto.ssl.insecure-hostname-verifier.insecure-hostname-verifier","path":"/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleOwnershipServiceImpl.java","start":{"line":29,"col":1,"offset":1080},"end":{"line":29,"col":53,"offset":1132},"extra":{"metavars":{},"message":"Insecure HostnameVerifier implementation detected. This will accept any SSL certificate with any hostname, which creates the possibility for man-in-the-middle attacks.","metadata":{"cwe":["CWE-295: Improper Certificate Validation"],"owasp":["A03:2017 - Sensitive Data Exposure","A07:2021 - Identification and Authentication Failures","A07:2025 - Authentication Failures"],"source-rule-url":"https://find-sec-bugs.github.io/bugs.htm#WEAK_HOSTNAME_VERIFIER","asvs":{"control_id":"9.2.1 Weak TLS","control_url":"https://github.com/OWASP/ASVS/blob/master/4.0/en/0x17-V9-Communications.md#v92-server-communications-security-requirements","section":"V9 Communications Verification Requirements","version":"4"},"category":"security","technology":["java"],"references":["https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures"],"subcategory":["audit"],"likelihood":"LOW","impact":"LOW","confidence":"LOW","license":"Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license","vulnerability_class":["Improper Authentication"],"source":"https://semgrep.dev/r/java.lang.security.audit.crypto.ssl.insecure-hostname-verifier.insecure-hostname-verifier","shortlink":"https://sg.run/5QoD","semgrep.dev":{"rule":{"origin":"community","r_id":9203,"rule_id":"lBU9n8","rv_id":1263006,"url":"https://semgrep.dev/playground/r/5PTo17W/java.lang.security.audit.crypto.ssl.insecure-hostname-verifier.insecure-hostname-verifier","version_id":"5PTo17W"}}},"severity":"WARNING","fingerprint":"f30d2544e9171736868a27c68c09614a94e638d32b23990e9d4bfe5de0438bb575935fb996ea554c2f3714f74e890517494bd6da47ea72a14ebd23708a221cea_0","lines":"import org.apache.http.conn.ssl.NoopHostnameVerifier;","is_ignored":false,"validation_state":"NO_VALIDATOR","engine_kind":"OSS"}},{"check_id":"problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1","path":"/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleOwnershipServiceImpl.java","start":{"line":73,"col":5,"offset":2777},"end":{"line":74,"col":83,"offset":2892},"extra":{"metavars":{},"message":"Detects direct creations of SSLConnectionSocketFactories that don't disallow SSL v2, SSL v3, and TLS v1. SSLSocketFactory can be used to validate the identity of the HTTPS server against a list of trusted certificates. These protocols are deprecated due to POODLE, man in the middle attacks, and other vulnerabilities.","metadata":{"likelihood":"HIGH","impact":"MEDIUM","confidence":"MEDIUM","category":"security","cwe":"CWE-319: Cleartext Transmission of Sensitive Information","owasp":"A03:2017 - Sensitive Data Exposure","references":["https://stackoverflow.com/questions/26429751/java-http-clients-and-poodle"],"subcategory":["vuln"],"technology":["java"],"vulnerability":"Insecure Transport","license":"Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license","vulnerability_class":["Mishandled Sensitive Information"],"source":"https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1","shortlink":"https://sg.run/l25E","semgrep.dev":{"rule":{"origin":"community","r_id":9413,"rule_id":"j2Uv2K","rv_id":946056,"url":"https://semgrep.dev/playground/r/GxTP7y6/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1","version_id":"GxTP7y6"}}},"severity":"WARNING","fingerprint":"8233a6da2d5647c58637e0a81e9bf5fa8c09f7617436206764edc1b7a7ff7876f42e657e9c82df2e8326b369852a8b1ade33aacf8a77e96123440b464e17ee83_0","lines":"    SSLConnectionSocketFactory csf =\n        new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);","is_ignored":false,"validation_state":"NO_VALIDATOR","engine_kind":"OSS"}},{"check_id":"generic.secrets.security.detected-private-key.detected-private-key","path":"/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.key","start":{"line":1,"col":1,"offset":0},"end":{"line":2,"col":65,"offset":92},"extra":{"metavars":{"$KEY":{"start":{"line":2,"col":1,"offset":28},"end":{"line":2,"col":65,"offset":92},"abstract_content":"MIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQD17BcGoFYiZupD"}},"message":"Private Key detected. This is a sensitive credential and should not be hardcoded here. Instead, store this in a separate, private file.","metadata":{"cwe":["CWE-798: Use of Hard-coded Credentials"],"source-rule-url":"https://github.com/grab/secret-scanner/blob/master/scanner/signatures/pattern.go","category":"security","technology":["secrets"],"confidence":"LOW","owasp":["A07:2021 - Identification and Authentication Failures","A07:2025 - Authentication Failures"],"references":["https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures"],"cwe2022-top25":true,"cwe2021-top25":true,"subcategory":["audit"],"likelihood":"LOW","impact":"MEDIUM","license":"Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license","vulnerability_class":["Hard-coded Secrets"],"source":"https://semgrep.dev/r/generic.secrets.security.detected-private-key.detected-private-key","shortlink":"https://sg.run/b7dr","semgrep.dev":{"rule":{"origin":"community","r_id":9070,"rule_id":"7KUQ0p","rv_id":1262888,"url":"https://semgrep.dev/playground/r/3ZT4X4Y/generic.secrets.security.detected-private-key.detected-private-key","version_id":"3ZT4X4Y"}}},"severity":"ERROR","fingerprint":"dbdd042151f8afa233aec15d10edd73b9025e2f363d8fd01a2111aacb589cb9bda8be80a83b28426cc965ca4d418a2d366be464ec246ee998034c0e6ef452d15_0","lines":"-----BEGIN PRIVATE KEY-----\nMIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQD17BcGoFYiZupD","is_ignored":false,"validation_state":"NO_VALIDATOR","engine_kind":"OSS"}}],"errors":[],"paths":{"scanned":["/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/CRAPIBootApplication.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/InitialDataConfig.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/JwtAuthEntryPoint.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/JwtAuthTokenFilter.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/JwtProvider.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/MailConfiguration.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/MailHogConfiguration.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/SSLConfig.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/WebSecurityConfig.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/constant/TestUsers.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/constant/UserMessage.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/AuthController.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ChangeEmailController.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ChangePhoneController.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/HealthCheckController.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ManagementControlller.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ProfileController.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/UserController.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/VehicleController.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/ChangeEmailRequest.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/ChangePhoneRequest.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/Otp.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/ProfileVideo.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/User.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/UserDetails.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/UserPrinciple.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleCompany.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleDetails.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleLocation.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleModel.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/enums/EFuelType.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/enums/ERole.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/enums/EStatus.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/CRAPIExceptionHandler.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/EntityNotFoundException.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/ExceptionHandler.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/IOExceptionHandler.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ApiKeyResponse.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/CRAPIResponse.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ChangeEmailForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ChangePhoneForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/DashboardResponse.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ErrorDetails.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ForgetPassword.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/JwtResponse.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/JwtTokenForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/LockAccountForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/LoginForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/LoginWithEmailToken.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/OtpForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/SeedUser.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/SignUpForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/UnlockAccountForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VehicleForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VehicleLocationResponse.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VehicleOwnership.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VideoForm.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/ChangeEmailRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/ChangePhoneRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/OtpRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/ProfileVideoRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/UserDetailsRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/UserRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleCompanyRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleDetailsRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleLocationRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleModelRepository.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/OtpServiceImpl.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/ProfileServiceImpl.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/UserDetailsServiceImpl.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/UserRegistrationServiceImpl.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/UserServiceImpl.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleOwnershipServiceImpl.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleServiceImpl.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/OtpService.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/ProfileService.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/UserRegistrationService.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/UserResetJob.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/UserService.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/VehicleOwnershipService.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/VehicleService.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/BashCommand.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/EmailTokenGenerator.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/GenerateVIN.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/MailBody.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/OTPGenerator.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/ProfileValidator.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/SMTPMailServer.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/UserData.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/VehicleLocationData.java","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/application.properties","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/keystore.sh","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.crt","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.key","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.keystore","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.p12","/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/logback.xml"]},"interfile_languages_used":[],"skipped_rules":[]}
+{
+  "version": "1.30.0",
+  "results": [
+    {
+      "check_id": "java.spring.security.audit.spring-csrf-disabled.spring-csrf-disabled",
+      "path": "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/WebSecurityConfig.java",
+      "start": {
+        "line": 98,
+        "col": 5,
+        "offset": 4046
+      },
+      "end": {
+        "line": 98,
+        "col": 26,
+        "offset": 4067
+      },
+      "extra": {
+        "metavars": {
+          "$OBJ": {
+            "start": {
+              "line": 98,
+              "col": 5,
+              "offset": 4046
+            },
+            "end": {
+              "line": 98,
+              "col": 9,
+              "offset": 4050
+            },
+            "abstract_content": "http"
+          }
+        },
+        "message": "CSRF protection is disabled for this configuration. This is a security risk.",
+        "metadata": {
+          "cwe": [
+            "CWE-352: Cross-Site Request Forgery (CSRF)"
+          ],
+          "owasp": [
+            "A01:2021 - Broken Access Control",
+            "A01:2025 - Broken Access Control"
+          ],
+          "source-rule-url": "https://find-sec-bugs.github.io/bugs.htm#SPRING_CSRF_PROTECTION_DISABLED",
+          "asvs": {
+            "control_id": "4.2.2 CSRF",
+            "control_url": "https://github.com/OWASP/ASVS/blob/master/4.0/en/0x12-V4-Access-Control.md#v42-operation-level-access-control",
+            "section": "V4 Access Control",
+            "version": "4"
+          },
+          "category": "security",
+          "technology": [
+            "spring"
+          ],
+          "references": [
+            "https://owasp.org/Top10/A01_2021-Broken_Access_Control"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "MEDIUM",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Cross-Site Request Forgery (CSRF)"
+          ],
+          "source": "https://semgrep.dev/r/java.spring.security.audit.spring-csrf-disabled.spring-csrf-disabled",
+          "shortlink": "https://sg.run/jRnl",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9221,
+              "rule_id": "OrU3gK",
+              "rv_id": 1263080,
+              "url": "https://semgrep.dev/playground/r/vdT06dL/java.spring.security.audit.spring-csrf-disabled.spring-csrf-disabled",
+              "version_id": "vdT06dL"
+            }
+          }
+        },
+        "severity": "WARNING",
+        "fingerprint": "3a3c5b631bf3bce75e55698042c0b390f41851f28a9d074247162a586a90bf81109f71a71eec16f1e23ad17eeb9dc8c1c0d18ab2c8616b35a337f21ae123c3a5_0",
+        "lines": "    http.csrf().disable();",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "OSS"
+      }
+    },
+    {
+      "check_id": "java.lang.security.audit.crypto.ssl.insecure-hostname-verifier.insecure-hostname-verifier",
+      "path": "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleOwnershipServiceImpl.java",
+      "start": {
+        "line": 29,
+        "col": 1,
+        "offset": 1080
+      },
+      "end": {
+        "line": 29,
+        "col": 53,
+        "offset": 1132
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Insecure HostnameVerifier implementation detected. This will accept any SSL certificate with any hostname, which creates the possibility for man-in-the-middle attacks.",
+        "metadata": {
+          "cwe": [
+            "CWE-295: Improper Certificate Validation"
+          ],
+          "owasp": [
+            "A03:2017 - Sensitive Data Exposure",
+            "A07:2021 - Identification and Authentication Failures",
+            "A07:2025 - Authentication Failures"
+          ],
+          "source-rule-url": "https://find-sec-bugs.github.io/bugs.htm#WEAK_HOSTNAME_VERIFIER",
+          "asvs": {
+            "control_id": "9.2.1 Weak TLS",
+            "control_url": "https://github.com/OWASP/ASVS/blob/master/4.0/en/0x17-V9-Communications.md#v92-server-communications-security-requirements",
+            "section": "V9 Communications Verification Requirements",
+            "version": "4"
+          },
+          "category": "security",
+          "technology": [
+            "java"
+          ],
+          "references": [
+            "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures"
+          ],
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "LOW",
+          "confidence": "LOW",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Improper Authentication"
+          ],
+          "source": "https://semgrep.dev/r/java.lang.security.audit.crypto.ssl.insecure-hostname-verifier.insecure-hostname-verifier",
+          "shortlink": "https://sg.run/5QoD",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9203,
+              "rule_id": "lBU9n8",
+              "rv_id": 1263006,
+              "url": "https://semgrep.dev/playground/r/5PTo17W/java.lang.security.audit.crypto.ssl.insecure-hostname-verifier.insecure-hostname-verifier",
+              "version_id": "5PTo17W"
+            }
+          }
+        },
+        "severity": "WARNING",
+        "fingerprint": "f30d2544e9171736868a27c68c09614a94e638d32b23990e9d4bfe5de0438bb575935fb996ea554c2f3714f74e890517494bd6da47ea72a14ebd23708a221cea_0",
+        "lines": "import org.apache.http.conn.ssl.NoopHostnameVerifier;",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "OSS"
+      }
+    },
+    {
+      "check_id": "problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1",
+      "path": "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleOwnershipServiceImpl.java",
+      "start": {
+        "line": 73,
+        "col": 5,
+        "offset": 2777
+      },
+      "end": {
+        "line": 74,
+        "col": 83,
+        "offset": 2892
+      },
+      "extra": {
+        "metavars": {},
+        "message": "Detects direct creations of SSLConnectionSocketFactories that don't disallow SSL v2, SSL v3, and TLS v1. SSLSocketFactory can be used to validate the identity of the HTTPS server against a list of trusted certificates. These protocols are deprecated due to POODLE, man in the middle attacks, and other vulnerabilities.",
+        "metadata": {
+          "likelihood": "HIGH",
+          "impact": "MEDIUM",
+          "confidence": "MEDIUM",
+          "category": "security",
+          "cwe": "CWE-319: Cleartext Transmission of Sensitive Information",
+          "owasp": "A03:2017 - Sensitive Data Exposure",
+          "references": [
+            "https://stackoverflow.com/questions/26429751/java-http-clients-and-poodle"
+          ],
+          "subcategory": [
+            "vuln"
+          ],
+          "technology": [
+            "java"
+          ],
+          "vulnerability": "Insecure Transport",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Mishandled Sensitive Information"
+          ],
+          "source": "https://semgrep.dev/r/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1",
+          "shortlink": "https://sg.run/l25E",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9413,
+              "rule_id": "j2Uv2K",
+              "rv_id": 946056,
+              "url": "https://semgrep.dev/playground/r/GxTP7y6/problem-based-packs.insecure-transport.java-stdlib.disallow-old-tls-versions1.disallow-old-tls-versions1",
+              "version_id": "GxTP7y6"
+            }
+          }
+        },
+        "severity": "WARNING",
+        "fingerprint": "8233a6da2d5647c58637e0a81e9bf5fa8c09f7617436206764edc1b7a7ff7876f42e657e9c82df2e8326b369852a8b1ade33aacf8a77e96123440b464e17ee83_0",
+        "lines": "    SSLConnectionSocketFactory csf =\n        new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "OSS"
+      }
+    },
+    {
+      "check_id": "generic.secrets.security.detected-private-key.detected-private-key",
+      "path": "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.key",
+      "start": {
+        "line": 1,
+        "col": 1,
+        "offset": 0
+      },
+      "end": {
+        "line": 2,
+        "col": 65,
+        "offset": 92
+      },
+      "extra": {
+        "metavars": {
+          "$KEY": {
+            "start": {
+              "line": 2,
+              "col": 1,
+              "offset": 28
+            },
+            "end": {
+              "line": 2,
+              "col": 65,
+              "offset": 92
+            },
+            "abstract_content": "MIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQD17BcGoFYiZupD"
+          }
+        },
+        "message": "Private Key detected. This is a sensitive credential and should not be hardcoded here. Instead, store this in a separate, private file.",
+        "metadata": {
+          "cwe": [
+            "CWE-798: Use of Hard-coded Credentials"
+          ],
+          "source-rule-url": "https://github.com/grab/secret-scanner/blob/master/scanner/signatures/pattern.go",
+          "category": "security",
+          "technology": [
+            "secrets"
+          ],
+          "confidence": "LOW",
+          "owasp": [
+            "A07:2021 - Identification and Authentication Failures",
+            "A07:2025 - Authentication Failures"
+          ],
+          "references": [
+            "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures"
+          ],
+          "cwe2022-top25": true,
+          "cwe2021-top25": true,
+          "subcategory": [
+            "audit"
+          ],
+          "likelihood": "LOW",
+          "impact": "MEDIUM",
+          "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+          "vulnerability_class": [
+            "Hard-coded Secrets"
+          ],
+          "source": "https://semgrep.dev/r/generic.secrets.security.detected-private-key.detected-private-key",
+          "shortlink": "https://sg.run/b7dr",
+          "semgrep.dev": {
+            "rule": {
+              "origin": "community",
+              "r_id": 9070,
+              "rule_id": "7KUQ0p",
+              "rv_id": 1262888,
+              "url": "https://semgrep.dev/playground/r/3ZT4X4Y/generic.secrets.security.detected-private-key.detected-private-key",
+              "version_id": "3ZT4X4Y"
+            }
+          }
+        },
+        "severity": "ERROR",
+        "fingerprint": "dbdd042151f8afa233aec15d10edd73b9025e2f363d8fd01a2111aacb589cb9bda8be80a83b28426cc965ca4d418a2d366be464ec246ee998034c0e6ef452d15_0",
+        "lines": "[REDACTED by vinsoc-sast-agent: private key literal removed before publishing — see dataset/labels/insecure_property.json for the finding's description]",
+        "is_ignored": false,
+        "validation_state": "NO_VALIDATOR",
+        "engine_kind": "OSS"
+      }
+    }
+  ],
+  "errors": [],
+  "paths": {
+    "scanned": [
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/CRAPIBootApplication.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/InitialDataConfig.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/JwtAuthEntryPoint.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/JwtAuthTokenFilter.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/JwtProvider.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/MailConfiguration.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/MailHogConfiguration.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/SSLConfig.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/config/WebSecurityConfig.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/constant/TestUsers.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/constant/UserMessage.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/AuthController.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ChangeEmailController.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ChangePhoneController.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/HealthCheckController.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ManagementControlller.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/ProfileController.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/UserController.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/controller/VehicleController.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/ChangeEmailRequest.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/ChangePhoneRequest.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/Otp.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/ProfileVideo.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/User.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/UserDetails.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/UserPrinciple.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleCompany.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleDetails.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleLocation.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/entity/VehicleModel.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/enums/EFuelType.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/enums/ERole.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/enums/EStatus.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/CRAPIExceptionHandler.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/EntityNotFoundException.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/ExceptionHandler.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/exception/IOExceptionHandler.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ApiKeyResponse.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/CRAPIResponse.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ChangeEmailForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ChangePhoneForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/DashboardResponse.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ErrorDetails.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/ForgetPassword.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/JwtResponse.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/JwtTokenForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/LockAccountForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/LoginForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/LoginWithEmailToken.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/OtpForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/SeedUser.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/SignUpForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/UnlockAccountForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VehicleForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VehicleLocationResponse.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VehicleOwnership.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/model/VideoForm.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/ChangeEmailRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/ChangePhoneRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/OtpRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/ProfileVideoRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/UserDetailsRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/UserRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleCompanyRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleDetailsRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleLocationRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/repository/VehicleModelRepository.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/OtpServiceImpl.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/ProfileServiceImpl.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/UserDetailsServiceImpl.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/UserRegistrationServiceImpl.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/UserServiceImpl.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleOwnershipServiceImpl.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/Impl/VehicleServiceImpl.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/OtpService.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/ProfileService.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/UserRegistrationService.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/UserResetJob.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/UserService.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/VehicleOwnershipService.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/service/VehicleService.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/BashCommand.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/EmailTokenGenerator.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/GenerateVIN.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/MailBody.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/OTPGenerator.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/ProfileValidator.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/SMTPMailServer.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/UserData.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/java/com/crapi/utils/VehicleLocationData.java",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/application.properties",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/keystore.sh",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.crt",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.key",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.keystore",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/certs/server.p12",
+      "/home/hoanglh98/projects/targets/crapi/services/identity/src/main/resources/logback.xml"
+    ]
+  },
+  "interfile_languages_used": [],
+  "skipped_rules": []
+}

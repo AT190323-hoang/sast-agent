@@ -80,7 +80,7 @@
     "file": "services/identity/src/main/resources/certs/server.key",
     "start_line": 1,
     "end_line": 2,
-    "code_snippet": "-----BEGIN PRIVATE KEY-----\nMIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQD17BcGoFYiZupD",
+    "code_snippet": "[REDACTED by vinsoc-sast-agent: private key literal removed before publishing — see dataset/labels/insecure_property.json for the finding's description]",
     "tool_message": "Private Key detected. This is a sensitive credential and should not be hardcoded here. Instead, store this in a separate, private file.",
     "label": null,
     "reason": null,
